@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import api from '../services/api';
 import Modal from '../components/Modal';
 
 const Filamentos = () => {
   const [filamentos, setFilamentos] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filtroCampo, setFiltroCampo] = useState('nome');
+  const [filtroValor, setFiltroValor] = useState('');
   const [formData, setFormData] = useState({ 
     nome: '', marca: '', tipo_polimero: 'PLA', cor: '', peso_total_g: 1000, preco_pago: 100, temperatura_bico: '', temperatura_mesa: ''
   });
@@ -29,13 +31,52 @@ const Filamentos = () => {
 
   const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
+  const filamentosFiltrados = filamentos.filter(f => {
+    if (!filtroValor) return true;
+
+    if (filtroCampo === 'nome') {
+      return f.nome?.toLowerCase().includes(filtroValor.toLowerCase());
+    }
+    if (filtroCampo === 'material') {
+      return f.tipo_polimero?.toLowerCase().includes(filtroValor.toLowerCase());
+    }
+    return true;
+  });
+
   return (
     <div>
-      <div className="flex-between" style={{ marginBottom: '2rem' }}>
+      <div className="flex-between" style={{ marginBottom: '2rem', gap: '1rem', flexWrap: 'wrap' }}>
         <h1>Estoque de Filamentos</h1>
-        <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
-          <Plus size={20} /> Adicionar Bobina
-        </button>
+
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', background: 'var(--bg-card)', padding: '0.3rem', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+            <Search size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
+            <select
+              className="form-select"
+              style={{ border: 'none', background: '#1c2532', fontWeight: '500', width: 'auto', paddingLeft: '0.2rem', paddingRight: '1.5rem' }}
+              value={filtroCampo}
+              onChange={(e) => { setFiltroCampo(e.target.value); setFiltroValor(''); }}
+            >
+              <option value="nome">Nome do Filamento</option>
+              <option value="material">Material</option>
+            </select>
+
+            <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
+
+            <input
+              type="text"
+              className="form-input"
+              placeholder={`Buscar por ${filtroCampo === 'nome' ? 'nome' : 'material'}...`}
+              style={{ border: 'none', background: 'transparent', boxShadow: 'none', minWidth: '200px' }}
+              value={filtroValor}
+              onChange={(e) => setFiltroValor(e.target.value)}
+            />
+          </div>
+
+          <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+            <Plus size={20} /> Adicionar Bobina
+          </button>
+        </div>
       </div>
 
       <div className="glass-card table-container">
@@ -53,7 +94,7 @@ const Filamentos = () => {
             </tr>
           </thead>
           <tbody>
-            {filamentos.map(f => (
+            {filamentosFiltrados.map(f => (
               <tr key={f._id}>
                 <td style={{ fontWeight: '500' }}>{f.nome}</td>
                 <td><span style={{ padding: '0.2rem 0.5rem', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', fontSize: '0.8rem' }}>{f.tipo_polimero}</span></td>
@@ -67,9 +108,11 @@ const Filamentos = () => {
                 <td className="text-success" style={{ fontWeight: '600' }}>{formatCurrency(f.custo_por_grama)}</td>
               </tr>
             ))}
-            {filamentos.length === 0 && (
+            {filamentosFiltrados.length === 0 && (
               <tr>
-                <td colSpan="8" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Nenhum filamento cadastrado.</td>
+                <td colSpan="8" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+                  {filamentos.length === 0 ? 'Nenhum filamento cadastrado.' : 'Nenhum filamento encontrado.'}
+                </td>
               </tr>
             )}
           </tbody>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, MessageCircle, Edit, Trash2 } from 'lucide-react';
+import { Plus, MessageCircle, Edit, Trash2, Search } from 'lucide-react';
 import api from '../services/api';
 import Modal from '../components/Modal';
 
@@ -7,6 +7,8 @@ const Clientes = () => {
   const [clientes, setClientes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [filtroCampo, setFiltroCampo] = useState('nome');
+  const [filtroValor, setFiltroValor] = useState('');
   const [formData, setFormData] = useState({ nome: '', telefone: '', instagram: '', observacoes: '' });
 
   useEffect(() => {
@@ -59,13 +61,57 @@ const Clientes = () => {
     window.open(`https://wa.me/55${cleanPhone}`, '_blank');
   };
 
+  const clientesFiltrados = clientes.filter(c => {
+    if (!filtroValor) return true;
+
+    if (filtroCampo === 'nome') {
+      return c.nome?.toLowerCase().includes(filtroValor.toLowerCase());
+    }
+    if (filtroCampo === 'telefone') {
+      const telefoneLimpo = c.telefone?.replace(/\D/g, '') || '';
+      const buscaLimpa = filtroValor.replace(/\D/g, '');
+      return (
+        c.telefone?.toLowerCase().includes(filtroValor.toLowerCase()) ||
+        (buscaLimpa && telefoneLimpo.includes(buscaLimpa))
+      );
+    }
+    return true;
+  });
+
   return (
     <div>
-      <div className="flex-between" style={{ marginBottom: '2rem' }}>
+      <div className="flex-between" style={{ marginBottom: '2rem', gap: '1rem', flexWrap: 'wrap' }}>
         <h1>Clientes</h1>
-        <button className="btn btn-primary" onClick={() => { setEditingId(null); setFormData({ nome: '', telefone: '', instagram: '', observacoes: '' }); setIsModalOpen(true); }}>
-          <Plus size={20} /> Novo Cliente
-        </button>
+
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', background: 'var(--bg-card)', padding: '0.3rem', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+            <Search size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
+            <select
+              className="form-select"
+              style={{ border: 'none', background: '#1c2532', fontWeight: '500', width: 'auto', paddingLeft: '0.2rem', paddingRight: '1.5rem' }}
+              value={filtroCampo}
+              onChange={(e) => { setFiltroCampo(e.target.value); setFiltroValor(''); }}
+            >
+              <option value="nome">Nome</option>
+              <option value="telefone">Telefone</option>
+            </select>
+
+            <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
+
+            <input
+              type="text"
+              className="form-input"
+              placeholder={`Buscar por ${filtroCampo === 'nome' ? 'nome' : 'telefone'}...`}
+              style={{ border: 'none', background: 'transparent', boxShadow: 'none', minWidth: '200px' }}
+              value={filtroValor}
+              onChange={(e) => setFiltroValor(e.target.value)}
+            />
+          </div>
+
+          <button className="btn btn-primary" onClick={() => { setEditingId(null); setFormData({ nome: '', telefone: '', instagram: '', observacoes: '' }); setIsModalOpen(true); }}>
+            <Plus size={20} /> Novo Cliente
+          </button>
+        </div>
       </div>
 
       <div className="glass-card table-container">
@@ -79,7 +125,7 @@ const Clientes = () => {
             </tr>
           </thead>
           <tbody>
-            {clientes.map(c => (
+            {clientesFiltrados.map(c => (
               <tr key={c._id}>
                 <td style={{ fontWeight: '500' }}>{c.nome}</td>
                 <td>{c.telefone}</td>
@@ -99,9 +145,11 @@ const Clientes = () => {
                 </td>
               </tr>
             ))}
-            {clientes.length === 0 && (
+            {clientesFiltrados.length === 0 && (
               <tr>
-                <td colSpan="4" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Nenhum cliente cadastrado.</td>
+                <td colSpan="4" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+                  {clientes.length === 0 ? 'Nenhum cliente cadastrado.' : 'Nenhum cliente encontrado.'}
+                </td>
               </tr>
             )}
           </tbody>
