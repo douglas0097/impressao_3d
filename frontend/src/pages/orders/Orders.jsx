@@ -1,3 +1,5 @@
+import Input from '../../components/Input';
+import Select from '../../components/Select';
 import Button from '../../components/Button';
 import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/DataTable';
@@ -158,7 +160,6 @@ const Orders = () => {
       ...(filtroCampo === 'status' ? statusOptions : paymentOptions),
     ] });
   }
-  const selectClass = 'cursor-pointer rounded-lg border border-border bg-surface px-2.5 py-2 text-xs text-text-secondary outline-none focus:border-brand focus:ring-2 focus:ring-brand/15';
 
   return (
     <div>
@@ -180,8 +181,8 @@ const Orders = () => {
           { key: 'tempo_peso', label: 'Tempo/Peso', className: 'whitespace-nowrap', render: p => `${p.tempo_estimado_horas}h / ${p.peso_estimado_g}g` },
           { key: 'preco', label: 'Preço Venda', className: 'font-semibold text-success whitespace-nowrap', render: p => formatCurrency(p.preco_final_cobrado || p.preco_sugerido) },
           { key: 'status', label: 'Status', render: p => <StatusBadge status={p.status} /> },
-          { key: 'pagamento', label: 'Pagamento', render: p => <select aria-label={`Pagamento de ${p.nome_peca}`} className={selectClass} value={p.status_pagamento || 'PENDENTE'} onChange={e => updatePaymentStatus(p._id, e.target.value)}>{paymentOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select> },
-          { key: 'actions', label: 'Ações', render: p => <select aria-label={`Status de ${p.nome_peca}`} className={selectClass} value={p.status} onChange={e => updateStatus(p._id, e.target.value)}>{statusOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select> },
+          { key: 'pagamento', label: 'Pagamento', render: p => <Select aria-label={`Pagamento de ${p.nome_peca}`} size="sm" className="w-auto max-w-full" value={p.status_pagamento || 'PENDENTE'} onChange={e => updatePaymentStatus(p._id, e.target.value)}>{paymentOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
+          { key: 'actions', label: 'Ações', render: p => <Select aria-label={`Status de ${p.nome_peca}`} size="sm" className="w-auto max-w-full" value={p.status} onChange={e => updateStatus(p._id, e.target.value)}>{statusOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
         ]}
         rows={pedidosFiltrados}
         getRowKey={p => p._id}
@@ -205,15 +206,15 @@ const Orders = () => {
         <form onSubmit={handleSubmit}>
           <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="form-group">
-              <label className="form-label">Cliente *</label>
-              <select className="form-select" required value={formData.cliente_id} onChange={e => setFormData({ ...formData, cliente_id: e.target.value })}>
+              <label htmlFor="orders-field-1" className="form-label">Cliente *</label>
+              <Select id="orders-field-1" required value={formData.cliente_id} onChange={e => setFormData({ ...formData, cliente_id: e.target.value })}>
                 <option value="">Selecione um cliente...</option>
                 {clientes.map(c => <option key={c._id} value={c._id}>{c.nome}</option>)}
-              </select>
+              </Select>
             </div>
             <div className="form-group">
-              <label className="form-label">Filamento *</label>
-              <select className="form-select" required value={formData.filamento_id} onChange={e => setFormData({ ...formData, filamento_id: e.target.value })}>
+              <label htmlFor="orders-field-2" className="form-label">Filamento *</label>
+              <Select id="orders-field-2" required value={formData.filamento_id} onChange={e => setFormData({ ...formData, filamento_id: e.target.value })}>
                 <option value="">Selecione um filamento...</option>
                 {filamentos.map(f => {
                   const estoque = f.estoque_gramas != null ? f.estoque_gramas : f.peso_total_g;
@@ -223,23 +224,23 @@ const Orders = () => {
                     </option>
                   );
                 })}
-              </select>
+              </Select>
             </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Nome da Peça *</label>
-            <input className="form-input" required value={formData.nome_peca} onChange={e => setFormData({ ...formData, nome_peca: e.target.value })} placeholder="Ex: TCG GB case 105%" />
+            <label htmlFor="orders-field-3" className="form-label">Nome da Peça *</label>
+            <Input id="orders-field-3" required value={formData.nome_peca} onChange={e => setFormData({ ...formData, nome_peca: e.target.value })} placeholder="Ex: TCG GB case 105%" />
           </div>
 
           <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="form-group">
-              <label className="form-label">Peso do Fatiador (g) *</label>
-              <input type="number" step="0.1" className="form-input" required value={formData.peso_estimado_g} onChange={e => setFormData({ ...formData, peso_estimado_g: e.target.value })} />
+              <label htmlFor="orders-field-4" className="form-label">Peso do Fatiador (g) *</label>
+              <Input id="orders-field-4" type="number" step="0.1" required value={formData.peso_estimado_g} onChange={e => setFormData({ ...formData, peso_estimado_g: e.target.value })} />
             </div>
             <div className="form-group">
-              <label className="form-label">Tempo do Fatiador (horas) *</label>
-              <input type="number" step="0.1" className="form-input" required value={formData.tempo_estimado_horas} onChange={e => setFormData({ ...formData, tempo_estimado_horas: e.target.value })} />
+              <label htmlFor="orders-field-5" className="form-label">Tempo do Fatiador (horas) *</label>
+              <Input id="orders-field-5" type="number" step="0.1" required value={formData.tempo_estimado_horas} onChange={e => setFormData({ ...formData, tempo_estimado_horas: e.target.value })} />
             </div>
           </div>
 

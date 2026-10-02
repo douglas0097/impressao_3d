@@ -1,5 +1,5 @@
 /** Shared button styles; native attributes and refs are forwarded to the button. */
-function Button({ children, variant = 'primary', size = 'md', fullWidth = false, loading = false, disabled = false, type = 'button', className = '', ...props }) {
+function Button({ children, variant = 'tertiary', size = 'md', fullWidth = false, loading = false, disabled = false, type = 'button', className = '', ...props }) {
   return (
     <button
       {...props}

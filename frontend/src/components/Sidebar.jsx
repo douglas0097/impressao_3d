@@ -77,7 +77,7 @@ const Sidebar = ({ collapsed = false, onToggle }) => {
               {group.items.map(({ to, icon: Icon, label }) => (
                 <NavLink key={to} to={to} end={to === '/'} aria-label={label} title={collapsed ? label : undefined}
                   className={({ isActive }) => `sidebar-item group relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-[9px] transition-colors md:min-h-10 md:flex-none md:py-2 md:text-xs ${collapsed ? 'md:justify-center md:px-0' : 'md:flex-row md:justify-start md:gap-3 md:px-2.5'} ${isActive ? 'sidebar-item-active font-semibold' : 'font-medium'}`}>
-                  <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  <span className="sidebar-item-icon flex size-7 shrink-0 items-center justify-center rounded-md">
                     <Icon size={18} strokeWidth={1.6} />
                   </span>
                   <span aria-hidden={collapsed} className={`sidebar-copy max-w-full truncate ${collapsed ? 'sidebar-copy-collapsed' : ''}`}>{label}</span>

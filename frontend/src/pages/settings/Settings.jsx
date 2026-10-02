@@ -1,3 +1,4 @@
+import Input from '../../components/Input';
 import Button from '../../components/Button';
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
@@ -66,32 +67,32 @@ const Settings = () => {
           <h3 style={{ marginBottom: '1rem', color: 'var(--primary)' }}>Energia e Máquina</h3>
           <div className="responsive-grid">
             <div className="form-group">
-              <label className="form-label">Custo Energia (R$/kWh)</label>
-              <input type="number" step="0.01" name="custo_energia_kwh" value={config.custo_energia_kwh} onChange={handleChange} className="form-input" required />
+              <label htmlFor="settings-field-1" className="form-label">Custo Energia (R$/kWh)</label>
+              <Input id="settings-field-1" type="number" step="0.01" name="custo_energia_kwh" value={config.custo_energia_kwh} onChange={handleChange} required />
             </div>
             <div className="form-group">
-              <label className="form-label">Potência da Impressora (W)</label>
-              <input type="number" name="potencia_impressora_w" value={config.potencia_impressora_w} onChange={handleChange} className="form-input" required />
+              <label htmlFor="settings-field-2" className="form-label">Potência da Impressora (W)</label>
+              <Input id="settings-field-2" type="number" name="potencia_impressora_w" value={config.potencia_impressora_w} onChange={handleChange} required />
             </div>
             <div className="form-group">
-              <label className="form-label">Custo Fixo Extra (R$/hora)</label>
-              <input type="number" step="0.01" name="custo_hora_impressao_adicional" value={config.custo_hora_impressao_adicional} onChange={handleChange} className="form-input" required />
+              <label htmlFor="settings-field-3" className="form-label">Custo Fixo Extra (R$/hora)</label>
+              <Input id="settings-field-3" type="number" step="0.01" name="custo_hora_impressao_adicional" value={config.custo_hora_impressao_adicional} onChange={handleChange} required />
             </div>
           </div>
 
           <h3 style={{ margin: '1.5rem 0 1rem', color: 'var(--primary)' }}>Taxas e Margens (%)</h3>
           <div className="responsive-grid">
             <div className="form-group">
-              <label className="form-label">Taxa Manutenção (%)</label>
-              <input type="number" step="0.01" name="taxa_manutencao_pct" value={config.taxa_manutencao_pct} onChange={handleChange} className="form-input" required />
+              <label htmlFor="settings-field-4" className="form-label">Taxa Manutenção (%)</label>
+              <Input id="settings-field-4" type="number" step="0.01" name="taxa_manutencao_pct" value={config.taxa_manutencao_pct} onChange={handleChange} required />
             </div>
             <div className="form-group">
-              <label className="form-label">Taxa Retrabalho (%)</label>
-              <input type="number" step="0.01" name="taxa_retrabalho_pct" value={config.taxa_retrabalho_pct} onChange={handleChange} className="form-input" required />
+              <label htmlFor="settings-field-5" className="form-label">Taxa Retrabalho (%)</label>
+              <Input id="settings-field-5" type="number" step="0.01" name="taxa_retrabalho_pct" value={config.taxa_retrabalho_pct} onChange={handleChange} required />
             </div>
             <div className="form-group">
-              <label className="form-label">Margem de Lucro Padrão (%)</label>
-              <input type="number" step="0.01" name="margem_lucro_padrao_pct" value={config.margem_lucro_padrao_pct} onChange={handleChange} className="form-input" required />
+              <label htmlFor="settings-field-6" className="form-label">Margem de Lucro Padrão (%)</label>
+              <Input id="settings-field-6" type="number" step="0.01" name="margem_lucro_padrao_pct" value={config.margem_lucro_padrao_pct} onChange={handleChange} required />
             </div>
           </div>
 

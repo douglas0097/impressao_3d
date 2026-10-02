@@ -4,6 +4,11 @@
 
 :root {
   color-scheme: light;
+  --button-tertiary: #10b981;
+  --button-tertiary-hover: #059669;
+  --button-tertiary-text: #047857;
+  --button-tertiary-label: #022c22;
+  --button-tertiary-focus: #047857;
   --button-primary: #2554c7;
   --button-primary-hover: #1e429f;
   --button-focus: #2554c7;
@@ -42,9 +47,22 @@
   --border-focus: color-mix(in srgb, var(--brand) 30%, transparent);
   --radius: 12px;
   --radius-sm: 8px;
+  --field-bg: #ffffff;
+  --field-border: #cbd5e1;
+  --field-hover-border: #94a3b8;
+  --field-ring: color-mix(in srgb, var(--brand) 22%, transparent);
 }
 [data-theme="dark"] {
   color-scheme: dark;
+  --field-bg: #131c28;
+  --field-border: #354154;
+  --field-hover-border: #526078;
+  --field-ring: color-mix(in srgb, var(--brand) 32%, transparent);
+  --button-tertiary-label: #ffffff;
+  --button-tertiary: #10b981;
+  --button-tertiary-hover: #059669;
+  --button-tertiary-text: #6ee7b7;
+  --button-tertiary-focus: #6ee7b7;
   --button-primary: #3566d6;
   --button-primary-hover: #2b57bf;
   --button-focus: #93b4ff;
@@ -106,9 +124,49 @@
   }
   .form-group { @apply mb-5; }
   .form-label { @apply mb-1.5 block text-xs font-medium text-text-secondary; }
-  .form-input, .form-select { @apply w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-text-primary transition-colors; }
-  .form-input::placeholder { @apply text-text-disabled; }
-  .form-input:focus, .form-select:focus { @apply border-brand outline-none ring-2 ring-brand/30; }
+  .field-control {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--field-border);
+    border-radius: 6px;
+    background: var(--field-bg);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+  }
+  .field-control::placeholder { color: var(--text-disabled); opacity: 1; }
+  .field-control:hover:not(:disabled):not(:focus) { border-color: var(--field-hover-border); }
+  .field-control:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--field-ring); }
+  .field-control:disabled { cursor: not-allowed; opacity: 0.5; box-shadow: none; }
+  .field-control[readonly] { background: var(--surface); }
+  .field-control[aria-invalid="true"] { border-color: var(--danger); }
+  .field-control[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 22%, transparent); }
+  .field-sm { height: 34px; padding-block: 6px; font-size: 12px; }
+  .field-textarea { height: auto; min-height: 88px; resize: vertical; }
+  .field-select {
+    appearance: none;
+    cursor: pointer;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23647187' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+  }
+  .field-select[multiple] { height: auto; background-image: none; padding-right: 12px; }
+  .field-select option { background: var(--field-bg); color: var(--text-primary); }
+  .field-input[type="file"] { height: auto; }
+  .field-input::file-selector-button { margin-right: 12px; border: 0; background: transparent; color: inherit; font-weight: 500; }
+  .field-input[type="search"]::-webkit-search-cancel-button { appearance: none; }
+  .field-search { position: relative; }
+  .field-search .field-input { padding-left: 38px; padding-right: 46px; }
+  .field-search-icon { position: absolute; top: 50%; left: 12px; transform: translateY(-50%); pointer-events: none; }
+  .field-search-clear { position: absolute; top: 50%; right: 4px; transform: translateY(-50%); }
   .btn {
     @apply inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg border border-transparent font-semibold;
     min-height: 40px;
@@ -117,6 +175,13 @@
     line-height: 1.25;
     transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
   }
+  .btn-tertiary {
+    background: var(--button-tertiary);
+    color: var(--button-tertiary-label);
+    box-shadow: 0 1px 2px rgb(15 23 42 / 12%);
+  }
+  .btn-tertiary:hover:not(:disabled) { background: var(--button-tertiary-hover); }
+  .btn-tertiary:active:not(:disabled) { box-shadow: inset 0 1px 3px rgb(15 23 42 / 20%); }
   .btn-primary {
     background: var(--button-primary);
     color: white;
@@ -152,8 +217,22 @@
   .text-primary { @apply text-brand; }
   .flex-between { @apply flex items-center justify-between; }
   .responsive-grid { @apply grid gap-4; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
-  .modal-overlay { @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm; }
-  .modal-content { @apply max-h-[90vh] w-full max-w-[500px] overflow-y-auto rounded-xl border border-border bg-surface p-8 shadow-xl; animation: modalIn 0.3s ease; }
+  .modal-overlay { @apply fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm; background: rgb(8 15 26 / 45%); }
+  .modal-content {
+    @apply flex w-full max-w-[500px] flex-col overflow-hidden rounded-2xl border bg-surface;
+    max-height: min(90dvh, calc(100dvh - 2rem));
+    border-color: color-mix(in srgb, var(--border) 65%, transparent);
+    box-shadow: 0 24px 64px rgb(0 0 0 / 20%), 0 4px 16px rgb(0 0 0 / 8%);
+    animation: modalIn 0.2s ease-out;
+  }
+  .modal-header {
+    @apply flex shrink-0 items-center justify-between gap-4 border-b px-5 py-4 sm:px-6;
+    border-color: color-mix(in srgb, var(--border) 45%, transparent);
+  }
+  .modal-title { @apply m-0 text-base font-semibold leading-snug tracking-tight; }
+  .modal-close { color: var(--text-disabled); border-radius: 8px; }
+  .modal-close:hover { color: var(--text-primary); }
+  .modal-body { @apply min-h-0 overflow-y-auto p-5 sm:p-6; }
 }
 /* Subtle tonal accents keep metrics distinct without competing with their values. */
 .modern-table {
@@ -244,8 +323,11 @@
   .metric-card:hover { transform: none; }
 }
 @keyframes modalIn {
-  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal-content { animation: none; }
 }
 
 /* The reference uses a light sidebar in light mode and neutral selection. */
@@ -269,6 +351,11 @@
 .sidebar-shell header { background: var(--nav-bg); }
 .sidebar-collapse { background: var(--nav-bg); }
 .sidebar-muted, .sidebar-item { color: var(--nav-text); }
+.sidebar-item-icon { color: var(--nav-text); }
+.sidebar-item-active .sidebar-item-icon {
+  background: color-mix(in srgb, var(--button-primary) 12%, transparent);
+  color: var(--button-primary);
+}
 .sidebar-item:hover, .sidebar-item-active, .sidebar-item-active:hover {
   background: var(--nav-hover);
   color: var(--nav-selected);
@@ -301,6 +388,7 @@
 
 /* Thin scrollbars for compact navigation and modal content. */
 .modal-content,
+.modal-body,
 .table-scroll,
 .table-container,
 .sidebar-shell nav {
@@ -308,6 +396,7 @@
   scrollbar-color: color-mix(in srgb, var(--text-disabled) 55%, transparent) transparent;
 }
 .modal-content::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar,
 .table-scroll::-webkit-scrollbar,
 .table-container::-webkit-scrollbar,
 .sidebar-shell nav::-webkit-scrollbar {
@@ -315,12 +404,14 @@
   height: 5px;
 }
 .modal-content::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track,
 .table-scroll::-webkit-scrollbar-track,
 .table-container::-webkit-scrollbar-track,
 .sidebar-shell nav::-webkit-scrollbar-track {
   background: transparent;
 }
 .modal-content::-webkit-scrollbar-thumb,
+.modal-body::-webkit-scrollbar-thumb,
 .table-scroll::-webkit-scrollbar-thumb,
 .table-container::-webkit-scrollbar-thumb,
 .sidebar-shell nav::-webkit-scrollbar-thumb {
@@ -329,6 +420,7 @@
   background: color-mix(in srgb, var(--text-disabled) 48%, transparent);
 }
 .modal-content::-webkit-scrollbar-thumb:hover,
+.modal-body::-webkit-scrollbar-thumb:hover,
 .table-scroll::-webkit-scrollbar-thumb:hover,
 .table-container::-webkit-scrollbar-thumb:hover,
 .sidebar-shell nav::-webkit-scrollbar-thumb:hover {
@@ -342,4 +434,18 @@
 @media (prefers-reduced-motion: reduce) {
   .btn { transition: none; }
   .btn-spinner { animation: none; }
+}
+
+/* Tertiary utility buttons also share the accent outside tables. */
+.btn-tertiary-soft {
+  background: color-mix(in srgb, var(--button-tertiary-text) 10%, var(--surface));
+  color: var(--button-tertiary-text);
+}
+.btn-tertiary-soft:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--button-tertiary-text) 18%, var(--surface));
+  color: var(--button-tertiary-text);
+}
+.btn-tertiary-soft svg { color: inherit; }
+.btn-tertiary:focus-visible, .btn-tertiary-soft:focus-visible {
+  outline-color: var(--button-tertiary-focus);
 }

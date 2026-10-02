@@ -1,3 +1,5 @@
+import Input from '../../components/Input';
+import Select from '../../components/Select';
 import Button from '../../components/Button';
 import React, { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
@@ -97,42 +99,42 @@ const Filaments = () => {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Nova Bobina">
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Nome / Cor *</label>
-            <input className="form-input" required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} placeholder="Ex: PLA Branco Pérola Silk" />
+            <label htmlFor="filaments-field-1" className="form-label">Nome / Cor *</label>
+            <Input id="filaments-field-1" required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} placeholder="Ex: PLA Branco Pérola Silk" />
           </div>
           <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="form-group">
-              <label className="form-label">Material *</label>
-              <select className="form-select" value={formData.tipo_polimero} onChange={e => setFormData({...formData, tipo_polimero: e.target.value})}>
+              <label htmlFor="filaments-field-2" className="form-label">Material *</label>
+              <Select id="filaments-field-2" value={formData.tipo_polimero} onChange={e => setFormData({...formData, tipo_polimero: e.target.value})}>
                 <option value="PLA">PLA</option>
                 <option value="PETG">PETG</option>
                 <option value="ABS">ABS</option>
                 <option value="TPU">TPU</option>
-              </select>
+              </Select>
             </div>
             <div className="form-group">
-              <label className="form-label">Marca</label>
-              <input className="form-input" value={formData.marca} onChange={e => setFormData({...formData, marca: e.target.value})} />
-            </div>
-          </div>
-          <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
-            <div className="form-group">
-              <label className="form-label">Peso Total (g) *</label>
-              <input type="number" className="form-input" required value={formData.peso_total_g} onChange={e => setFormData({...formData, peso_total_g: e.target.value})} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Preço Pago (R$) *</label>
-              <input type="number" step="0.01" className="form-input" required value={formData.preco_pago} onChange={e => setFormData({...formData, preco_pago: e.target.value})} />
+              <label htmlFor="filaments-field-3" className="form-label">Marca</label>
+              <Input id="filaments-field-3" value={formData.marca} onChange={e => setFormData({...formData, marca: e.target.value})} />
             </div>
           </div>
           <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="form-group">
-              <label className="form-label">Temp. Bico (°C)</label>
-              <input type="number" className="form-input" value={formData.temperatura_bico} onChange={e => setFormData({...formData, temperatura_bico: e.target.value})} placeholder="Ex: 200" />
+              <label htmlFor="filaments-field-4" className="form-label">Peso Total (g) *</label>
+              <Input id="filaments-field-4" type="number" required value={formData.peso_total_g} onChange={e => setFormData({...formData, peso_total_g: e.target.value})} />
             </div>
             <div className="form-group">
-              <label className="form-label">Temp. Mesa (°C)</label>
-              <input type="number" className="form-input" value={formData.temperatura_mesa} onChange={e => setFormData({...formData, temperatura_mesa: e.target.value})} placeholder="Ex: 60" />
+              <label htmlFor="filaments-field-5" className="form-label">Preço Pago (R$) *</label>
+              <Input id="filaments-field-5" type="number" step="0.01" required value={formData.preco_pago} onChange={e => setFormData({...formData, preco_pago: e.target.value})} />
+            </div>
+          </div>
+          <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+            <div className="form-group">
+              <label htmlFor="filaments-field-6" className="form-label">Temp. Bico (°C)</label>
+              <Input id="filaments-field-6" type="number" value={formData.temperatura_bico} onChange={e => setFormData({...formData, temperatura_bico: e.target.value})} placeholder="Ex: 200" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="filaments-field-7" className="form-label">Temp. Mesa (°C)</label>
+              <Input id="filaments-field-7" type="number" value={formData.temperatura_mesa} onChange={e => setFormData({...formData, temperatura_mesa: e.target.value})} placeholder="Ex: 60" />
             </div>
           </div>
           <Button type="submit" fullWidth className="mt-4">Salvar Bobina</Button>

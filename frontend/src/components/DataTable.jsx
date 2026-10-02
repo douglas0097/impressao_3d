@@ -1,3 +1,5 @@
+import Input from './Input';
+import Select from './Select';
 import Button from './Button';
 import { useId, useState } from 'react';
 import { FiSearch, FiX, FiUsers } from 'react-icons/fi';
@@ -30,16 +32,16 @@ function DataTable({ title, description, columns, rows, getRowKey, search, filte
         </div>
         <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto">
           {search && (
-            <div className="flex min-w-0 flex-1 items-center gap-2 rounded border border-border bg-surface px-3 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/15 lg:w-64 lg:flex-none">
-              <FiSearch size={16} aria-hidden="true" className="shrink-0 text-text-disabled" />
-              <input type={search.type || 'search'} aria-label={search.label || 'Pesquisar registros'} placeholder={search.placeholder || 'Pesquisar...'} value={search.value} onChange={event => handleSearch(event.target.value)} className="min-w-0 w-full bg-transparent py-2.5 text-xs text-text-primary outline-none placeholder:text-text-disabled [&::-webkit-search-cancel-button]:appearance-none" />
-              {search.value && <Button type="button" aria-label="Limpar pesquisa" onClick={() => handleSearch('')} variant="ghost" size="icon-sm" className="shrink-0"><FiX size={14} /></Button>}
+            <div className="field-search min-w-0 flex-1 lg:w-64 lg:flex-none">
+              <FiSearch size={16} aria-hidden="true" className="field-search-icon text-text-disabled" />
+              <Input type={search.type || 'search'} aria-label={search.label || 'Pesquisar registros'} placeholder={search.placeholder || 'Pesquisar...'} value={search.value} onChange={event => handleSearch(event.target.value)} />
+              {search.value && <Button type="button" aria-label="Limpar pesquisa" onClick={() => handleSearch('')} variant="ghost" size="icon-sm" className="field-search-clear"><FiX size={14} /></Button>}
             </div>
           )}
           {filters.map(filter => (
-            <select key={filter.label} aria-label={filter.label} value={filter.value} onChange={event => { setPage(1); filter.onChange(event.target.value); }} className="max-w-full cursor-pointer rounded border border-border bg-surface px-3 py-2.5 text-xs text-text-secondary outline-none focus:border-brand focus:ring-2 focus:ring-brand/15">
+            <Select key={filter.label} aria-label={filter.label} value={filter.value} onChange={event => { setPage(1); filter.onChange(event.target.value); }} className="w-auto max-w-full">
               {filter.options.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </select>
+            </Select>
           ))}
         </div>
       </header>

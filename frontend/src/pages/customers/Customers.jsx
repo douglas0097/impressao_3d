@@ -1,3 +1,5 @@
+import Input from '../../components/Input';
+import Textarea from '../../components/Textarea';
 import Button from '../../components/Button';
 import React, { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
@@ -5,6 +7,7 @@ import { FiPlus, FiMessageCircle, FiEdit2, FiTrash2, FiPhone, FiInstagram } from
 import DataTable from '../../components/DataTable';
 import api from '../../services/api';
 import Modal from '../../components/Modal';
+import { mascaraTelefone } from '../../utils/mascaraTelefone';
 
 const Customers = () => {
   const [clientes, setClientes] = useState([]);
@@ -163,20 +166,22 @@ const Customers = () => {
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingId ? "Editar Cliente" : "Novo Cliente"}>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Nome *</label>
-            <input className="form-input" required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} />
+            <label htmlFor="customers-field-1" className="form-label text-text-primary font-semibold">Nome do cliente <span className="text-brand" aria-hidden="true">*</span></label>
+            <Input id="customers-field-1" autoComplete="name" placeholder="Ex.: Maria Oliveira" required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} />
+          </div>
+          <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+          <div className="form-group">
+            <label htmlFor="customers-field-2" className="form-label text-text-primary font-semibold">Telefone / WhatsApp</label>
+            <Input id="customers-field-2" type="tel" inputMode="tel" autoComplete="tel-national" maxLength={15} value={mascaraTelefone(formData.telefone)} onChange={e => setFormData({...formData, telefone: e.target.value.replace(/\D/g, '').slice(0, 11)})} placeholder="(85) 99999-9999" />
           </div>
           <div className="form-group">
-            <label className="form-label">Telefone (WhatsApp)</label>
-            <input className="form-input" value={formData.telefone} onChange={e => setFormData({...formData, telefone: e.target.value})} placeholder="Ex: 11999999999" />
+            <label htmlFor="customers-field-3" className="form-label text-text-primary font-semibold">Perfil no Instagram</label>
+            <Input id="customers-field-3" placeholder="@usuario" autoCapitalize="none" spellCheck={false} value={formData.instagram} onChange={e => setFormData({...formData, instagram: e.target.value})} />
+          </div>
           </div>
           <div className="form-group">
-            <label className="form-label">Instagram</label>
-            <input className="form-input" value={formData.instagram} onChange={e => setFormData({...formData, instagram: e.target.value})} />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Observações</label>
-            <textarea className="form-input" value={formData.observacoes} onChange={e => setFormData({...formData, observacoes: e.target.value})} rows="3"></textarea>
+            <label htmlFor="customers-field-4" className="form-label text-text-primary font-semibold">Observações sobre o cliente</label>
+            <Textarea id="customers-field-4" placeholder="Adicione preferências, detalhes de contato ou outras informações úteis." value={formData.observacoes} onChange={e => setFormData({...formData, observacoes: e.target.value})} rows="3"></Textarea>
           </div>
           <Button type="submit" fullWidth className="mt-4">Salvar Cliente</Button>
         </form>
