@@ -52,8 +52,8 @@ const Sidebar = ({ collapsed = false, onToggle }) => {
   };
 
   return (
-    <aside aria-label="Menu lateral" className={`sidebar-shell fixed inset-x-0 bottom-0 z-[60] border-t md:inset-x-auto md:inset-y-0 md:left-0 md:flex md:flex-col md:border-t-0 md:border-r ${collapsed ? 'md:w-[76px]' : 'md:w-[252px]'}`}>
-      <header className={`relative hidden h-16 shrink-0 items-center border-b border-inherit md:flex ${collapsed ? 'justify-center px-3' : 'gap-2 px-4'}`}>
+    <aside aria-label="Menu lateral" className={`sidebar-shell fixed inset-x-0 bottom-0 z-[100] border-t md:inset-x-auto md:inset-y-0 md:left-0 md:flex md:flex-col md:border-t-0 md:border-r ${collapsed ? 'md:w-[76px]' : 'md:w-[252px]'}`}>
+      <header className={`relative z-20 hidden h-16 shrink-0 items-center border-b border-inherit md:flex ${collapsed ? 'justify-center px-3' : 'gap-2 px-4'}`}>
         <NavLink to="/" aria-label="3D Manager - Dashboard" className="flex items-center gap-2 text-inherit hover:text-inherit">
           <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-brand-soft text-brand"><BrandIsotype size={19} /></span>
           <div aria-hidden={collapsed} className={`sidebar-copy ${collapsed ? 'sidebar-copy-collapsed' : ''}`}>
@@ -63,15 +63,15 @@ const Sidebar = ({ collapsed = false, onToggle }) => {
         </NavLink>
         <button type="button" onClick={onToggle} aria-expanded={!collapsed} aria-controls="sidebar-navigation"
           aria-label={collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'} title={collapsed ? 'Expandir menu' : 'Recolher menu'}
-          className="sidebar-collapse absolute -right-3.5 bottom-[-15px] flex size-7 cursor-pointer items-center justify-center rounded-md border border-inherit shadow-sm">
+          className="sidebar-collapse absolute -right-3.5 bottom-[-15px] z-[100] flex size-7 cursor-pointer items-center justify-center rounded-md border border-inherit shadow-sm">
           {collapsed ? <FiChevronsRight size={15} /> : <FiChevronsLeft size={15} />}
         </button>
       </header>
 
-      <nav id="sidebar-navigation" aria-label={"Navega\u00e7\u00e3o principal"} className={`flex items-center gap-1 p-2 md:block md:min-h-0 md:flex-1 md:overflow-y-auto md:py-6 ${collapsed ? 'md:px-3' : 'md:px-4'}`}>
+      <nav id="sidebar-navigation" aria-label={"Navega\u00e7\u00e3o principal"} className={`flex items-center gap-1 p-2 md:block md:min-h-0 md:flex-1 md:overflow-x-hidden md:overflow-y-auto md:py-6 ${collapsed ? 'md:px-3' : 'md:px-4'}`}>
         {groups.map(group => (
           <section key={group.label} aria-label={group.label} className="contents md:mb-6 md:block">
-            <h2 aria-hidden={collapsed} className={`sidebar-copy sidebar-muted mb-2.5 hidden px-2.5 text-[9px] font-semibold tracking-[0.12em] uppercase md:block ${collapsed ? 'sidebar-copy-collapsed' : ''}`}>{group.label}</h2>
+            <h2 aria-hidden={collapsed} className={`sidebar-copy sidebar-muted mb-2.5 hidden truncate px-2.5 text-[9px] font-semibold tracking-[0.12em] uppercase md:block ${collapsed ? 'sidebar-copy-collapsed' : ''}`}>{group.label}</h2>
             <div className="contents md:flex md:flex-col md:gap-1">
               {group.items.map(({ to, icon: Icon, label }) => (
                 <NavLink key={to} to={to} end={to === '/'} aria-label={label} title={collapsed ? label : undefined}
