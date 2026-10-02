@@ -13,11 +13,68 @@ export const getPedidos = async (req, res) => {
 
 export const createPedido = async (req, res) => {
   try {
-    const pedido = new Pedido(req.body);
+    const {
+      cliente_id,
+      nome_peca,
+      link_modelo,
+      filamento_id,
+      quantidade_pecas,
+      peso_estimado_g,
+      tempo_estimado_horas
+    } = req.body;
+
+    // Buscar o filamento
+    const filamento = await Filamento.findById(filamento_id);
+
+    if (!filamento) {
+      return res.status(404).json({
+        message: 'Filamento não encontrado'
+      });
+    }
+
+    // Buscar configurações globais
+    const config = await Configuracao.findOne();
+
+    if (!config) {
+      return res.status(404).json({
+        message: 'Configuração não encontrada'
+      });
+    }
+
+    // Recalcular os valores no backend
+    const valores = calcularValoresOrcamento({
+      filamento,
+      peso_estimado_g,
+      tempo_estimado_horas,
+      config
+    });
+
+    // Criar o pedido com os valores calculados pelo backend
+    const pedido = new Pedido({
+      cliente_id,
+      nome_peca,
+      link_modelo,
+      filamento_id,
+      quantidade_pecas,
+      peso_estimado_g,
+      tempo_estimado_horas,
+
+      // Snapshot financeiro
+      custo_filamento: valores.custo_filamento,
+      custo_tempo_impressao: valores.custo_tempo_impressao,
+      custo_total_sem_lucro: valores.custo_total_sem_lucro,
+      preco_sugerido: valores.preco_sugerido,
+      preco_custo: valores.preco_custo
+    });
+
     const saved = await pedido.save();
+
     res.status(201).json(saved);
+
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({
+      message: error.message
+    });
   }
 };
 
@@ -68,48 +125,100 @@ export const deletePedido = async (req, res) => {
 
 export const calcularOrcamento = async (req, res) => {
   try {
-    const { filamento_id, peso_estimado_g, tempo_estimado_horas } = req.body;
-    
+    const {
+      filamento_id,
+      peso_estimado_g,
+      tempo_estimado_horas
+    } = req.body;
+
+    if (!filamento_id) {
+      return res.status(400).json({
+        message: 'Filamento não informado'
+      });
+    }
+
+    if (peso_estimado_g == null) {
+      return res.status(400).json({
+        message: 'Quantidade de filamento não informada'
+      });
+    }
+
+    if (tempo_estimado_horas == null) {
+      return res.status(400).json({
+        message: 'Tempo de impressão não informado'
+      });
+    }
+
     const filamento = await Filamento.findById(filamento_id);
-    let config = await Configuracao.findOne();
-    
-    if (!config) config = await Configuracao.create({});
-    if (!filamento) return res.status(404).json({ message: 'Filamento não encontrado' });
 
-    // 1. Custo do Filamento
-    const custo_filamento = peso_estimado_g * filamento.custo_por_grama;
+    if (!filamento) {
+      return res.status(404).json({
+        message: 'Filamento não encontrado'
+      });
+    }
 
-    // 2. Custo de Energia e Máquina
-    // kWh = (Potencia / 1000) * Horas
-    const energia_kwh = (config.potencia_impressora_w / 1000) * tempo_estimado_horas;
-    const custo_energia = energia_kwh * config.custo_energia_kwh;
-    
-    // 3. Custos Operacionais Adicionais por hora
-    const custo_hora_adicional = tempo_estimado_horas * config.custo_hora_impressao_adicional;
+    const config = await Configuracao.findOne();
 
-    // 4. Manutenção e Retrabalho
-    // Aplicados sobre os custos básicos
-    const custo_base = custo_filamento + custo_energia + custo_hora_adicional;
-    const custo_manutencao = custo_base * (config.taxa_manutencao_pct / 100);
-    const custo_retrabalho = custo_base * (config.taxa_retrabalho_pct / 100);
+    if (!config) {
+      return res.status(404).json({
+        message: 'Configuração não encontrada'
+      });
+    }
 
-    const custo_total_sem_lucro = custo_base + custo_manutencao + custo_retrabalho;
-
-    // 5. Preço Sugerido (com Margem de Lucro Padrão)
-    // Preço de venda = Custo Total / (1 - (Margem / 100))
-    // Opcional: ou Custo Total * (1 + (Margem / 100)) dependendo de como preferem (Markup vs Margem)
-    // Vamos usar Markup simples que é mais comum
-    const preco_sugerido = custo_total_sem_lucro * (1 + (config.margem_lucro_padrao_pct / 100));
-
-    res.json({
-      custo_filamento,
-      custo_tempo_energia: custo_energia + custo_hora_adicional,
-      custo_manutencao,
-      custo_retrabalho,
-      custo_total_sem_lucro,
-      preco_sugerido
+    const valores = calcularValoresOrcamento({
+      filamento,
+      peso_estimado_g,
+      tempo_estimado_horas,
+      config
     });
+
+    res.json(valores);
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message
+    });
   }
+};
+
+
+const calcularValoresOrcamento = ({
+  filamento,
+  peso_estimado_g,
+  tempo_estimado_horas,
+  config
+}) => {
+  // 1. Custo do filamento
+  const custo_filamento =
+    (filamento.preco_kg / 1000) *
+    peso_estimado_g *
+    config.taxa_retrabalho;
+
+  // 2. Custo do tempo de impressão (2.10 + 0.75) * 1.9
+  const custo_tempo_impressao =
+    (config.taxa_manutencao + config.custo_energia) *
+    tempo_estimado_horas;
+
+  // 3. Custo total sem lucro
+  const custo_total_sem_lucro =
+    custo_filamento +
+    custo_tempo_impressao;
+
+  // 4. Preço sugerido
+  const preco_sugerido =
+    custo_total_sem_lucro *
+    config.margem_lucro_padrao;
+
+  // 5. Preço de custo
+  const preco_custo =
+    custo_filamento +
+    (config.custo_energia * tempo_estimado_horas);
+
+  return {
+    custo_filamento,
+    custo_tempo_impressao,
+    custo_total_sem_lucro,
+    preco_sugerido,
+    preco_custo
+  };
 };

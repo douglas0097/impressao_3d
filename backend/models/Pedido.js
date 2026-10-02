@@ -11,9 +11,10 @@ const pedidoSchema = new mongoose.Schema({
   
   // Valores financeiros salvos no momento do pedido (snapshot)
   custo_filamento: { type: Number },
-  custo_tempo_energia: { type: Number },
+  custo_tempo_impressao: { type: Number },
   custo_total_sem_lucro: { type: Number },
   preco_sugerido: { type: Number },
+  preco_custo: { type: Number },
   preco_final_cobrado: { type: Number },
 
   // Status

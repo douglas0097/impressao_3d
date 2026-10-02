@@ -1,12 +1,23 @@
 import mongoose from 'mongoose';
 
 const configuracaoSchema = new mongoose.Schema({
-  custo_energia_kwh: { type: Number, default: 0.90 },
-  potencia_impressora_w: { type: Number, default: 300 },
-  custo_hora_impressao_adicional: { type: Number, default: 1.00 },
-  taxa_manutencao_pct: { type: Number, default: 5 },
+  custo_energia: { type: Number, default: 0.90 },
+  taxa_manutencao: { type: Number, default: 5 },
   taxa_retrabalho_pct: { type: Number, default: 10 },
   margem_lucro_padrao_pct: { type: Number, default: 40 }
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+configuracaoSchema.virtual('taxa_retrabalho').get(function() {
+  return (this.taxa_retrabalho_pct / 100) + 1;
+});
+
+
+configuracaoSchema.virtual('margem_lucro_padrao').get(function() {
+  return (this.margem_lucro_padrao_pct / 100) + 1;
+});
 
 export default mongoose.model('Configuracao', configuracaoSchema);
