@@ -1,5 +1,7 @@
+import Button from '../../components/Button';
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
+import PageHeader from '../../components/PageHeader';
 
 const Settings = () => {
   const [config, setConfig] = useState({
@@ -53,10 +55,10 @@ const Settings = () => {
 
   return (
     <div>
-      <h1>Parâmetros Globais de Custo</h1>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-        Ajuste as taxas que serão usadas pelo motor de orçamentos.
-      </p>
+      <PageHeader
+        title="Parâmetros Globais de Custo"
+        subtitle="Ajuste as taxas que serão usadas pelo motor de orçamentos."
+      />
 
       <div className="glass-card" style={{ maxWidth: '800px' }}>
         <form onSubmit={handleSubmit}>
@@ -94,9 +96,9 @@ const Settings = () => {
           </div>
 
           <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button type="submit" className="btn btn-primary" disabled={saving}>
+            <Button type="submit" loading={saving}>
               {saving ? 'Salvando...' : 'Salvar Configurações'}
-            </button>
+            </Button>
             {message && <span className="text-success">{message}</span>}
           </div>
         </form>

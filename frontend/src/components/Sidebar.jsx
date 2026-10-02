@@ -1,3 +1,4 @@
+import Button from './Button';
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FiMoon, FiSun, FiChevronsLeft, FiChevronsRight, FiLogOut } from 'react-icons/fi';
@@ -61,11 +62,11 @@ const Sidebar = ({ collapsed = false, onToggle }) => {
             <span className="sidebar-muted block text-[8px] tracking-wide">STUDIO & PRICING</span>
           </div>
         </NavLink>
-        <button type="button" onClick={onToggle} aria-expanded={!collapsed} aria-controls="sidebar-navigation"
+        <Button variant="ghost" size="icon-sm" type="button" onClick={onToggle} aria-expanded={!collapsed} aria-controls="sidebar-navigation"
           aria-label={collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'} title={collapsed ? 'Expandir menu' : 'Recolher menu'}
-          className="sidebar-collapse absolute -right-3.5 -bottom-3.75 z-100 flex size-7 cursor-pointer items-center justify-center rounded-md border border-inherit shadow-sm">
-          {collapsed ? <FiChevronsRight size={15} /> : <FiChevronsLeft size={15} />}
-        </button>
+          className="sidebar-collapse absolute -right-3.5 -bottom-3.75 z-100 border border-inherit shadow-sm">
+          {collapsed ? <FiChevronsRight size={15} className="text-blue-600 dark:text-blue-400" /> : <FiChevronsLeft size={15} className="text-blue-600 dark:text-blue-400" />}
+        </Button>
       </header>
 
       <nav id="sidebar-navigation" aria-label={"Navega\u00e7\u00e3o principal"} className={`flex items-center gap-1 p-2 md:block md:min-h-0 md:flex-1 md:overflow-x-hidden md:overflow-y-auto md:py-6 ${collapsed ? 'md:px-3' : 'md:px-4'}`}>
@@ -76,7 +77,9 @@ const Sidebar = ({ collapsed = false, onToggle }) => {
               {group.items.map(({ to, icon: Icon, label }) => (
                 <NavLink key={to} to={to} end={to === '/'} aria-label={label} title={collapsed ? label : undefined}
                   className={({ isActive }) => `sidebar-item group relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-[9px] transition-colors md:min-h-10 md:flex-none md:py-2 md:text-xs ${collapsed ? 'md:justify-center md:px-0' : 'md:flex-row md:justify-start md:gap-3 md:px-2.5'} ${isActive ? 'sidebar-item-active font-semibold' : 'font-medium'}`}>
-                  <Icon size={18} strokeWidth={1.6} className="shrink-0" />
+                  <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                    <Icon size={18} strokeWidth={1.6} />
+                  </span>
                   <span aria-hidden={collapsed} className={`sidebar-copy max-w-full truncate ${collapsed ? 'sidebar-copy-collapsed' : ''}`}>{label}</span>
                 </NavLink>
               ))}
@@ -84,14 +87,14 @@ const Sidebar = ({ collapsed = false, onToggle }) => {
           </section>
         ))}
         <div className="flex shrink-0 items-center gap-1 md:hidden">
-          <button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label={`Ativar ${themeLabel.toLowerCase()}`} title={themeLabel}
-            className="sidebar-item flex cursor-pointer items-center justify-center rounded-lg p-2">
+          <Button variant="ghost" size="icon-sm" type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label={`Ativar ${themeLabel.toLowerCase()}`} title={themeLabel}
+            className="sidebar-item">
             {theme === 'dark' ? <FiSun size={20} /> : <FiMoon size={20} />}
-          </button>
-          <button type="button" onClick={handleLogout} aria-label="Sair" title="Sair"
-            className="sidebar-logout flex cursor-pointer items-center justify-center rounded-lg p-2">
+          </Button>
+          <Button variant="ghost" size="icon-sm" type="button" onClick={handleLogout} aria-label="Sair" title="Sair"
+            className="sidebar-logout">
             <FiLogOut size={20} />
-          </button>
+          </Button>
         </div>
       </nav>
 
@@ -104,14 +107,14 @@ const Sidebar = ({ collapsed = false, onToggle }) => {
           </div>
         </div>
         <div className={`flex items-center gap-1 ${collapsed ? 'flex-col' : ''}`}>
-          <button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label={`Ativar ${themeLabel.toLowerCase()}`} title={themeLabel}
-            className="sidebar-item flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md">
+          <Button variant="ghost" size="icon-sm" type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label={`Ativar ${themeLabel.toLowerCase()}`} title={themeLabel}
+            className="sidebar-item shrink-0">
             {theme === 'dark' ? <FiSun size={16} strokeWidth={1.6} /> : <FiMoon size={16} strokeWidth={1.6} />}
-          </button>
-          <button type="button" onClick={handleLogout} aria-label="Sair" title="Sair"
-            className="sidebar-logout flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md">
+          </Button>
+          <Button variant="ghost" size="icon-sm" type="button" onClick={handleLogout} aria-label="Sair" title="Sair"
+            className="sidebar-logout shrink-0">
             <FiLogOut size={16} strokeWidth={1.6} />
-          </button>
+          </Button>
         </div>
       </footer>
     </aside>

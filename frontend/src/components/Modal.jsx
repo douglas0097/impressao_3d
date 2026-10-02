@@ -1,3 +1,4 @@
+import Button from './Button';
 import React from 'react';
 import { FiX } from 'react-icons/fi';
 
@@ -9,12 +10,11 @@ const Modal = ({ isOpen, onClose, title, children }) => {
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="flex-between" style={{ marginBottom: '1.5rem' }}>
           <h2 style={{ margin: 0 }}>{title}</h2>
-          <button 
+          <Button variant="ghost" size="icon" aria-label="Fechar modal"
             onClick={onClose}
-            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
           >
             <FiX size={24} />
-          </button>
+          </Button>
         </div>
         {children}
       </div>

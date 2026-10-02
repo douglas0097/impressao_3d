@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TbCurrencyReal, TbTrendingUp, TbPrinter, TbCircleCheck } from 'react-icons/tb';
 import MetricCard from '../../components/MetricCard';
+import PageHeader from '../../components/PageHeader';
 import api from '../../services/api';
 
 const Dashboard = () => {
@@ -36,7 +37,10 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1>Dashboard Operacional</h1>
+      <PageHeader
+        title="Dashboard Operacional"
+        subtitle="Acompanhe o faturamento, o lucro e o andamento dos seus pedidos."
+      />
       
       <div className="responsive-grid">
         <MetricCard 
@@ -48,29 +52,25 @@ const Dashboard = () => {
         <MetricCard 
           title="Lucro Estimado" 
           value={formatCurrency(metrics.lucro_estimado)} 
+          tone="emerald"
           icon={<TbTrendingUp size={24} />}
           trend={{ isPositive: true, value: 'Margem saudável' }}
         />
         <MetricCard 
           title="Pedidos em Andamento" 
           value={metrics.pedidos_em_andamento} 
+          tone="amber"
           icon={<TbPrinter size={24} />}
         />
         <MetricCard 
           title="Pedidos Concluídos" 
           value={metrics.pedidos_concluidos} 
+          tone="violet"
           icon={<TbCircleCheck size={24} />}
         />
       </div>
 
-      <div className="glass-card" style={{ marginTop: '2rem' }}>
-        <h2>Ações Rápidas</h2>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <a href="/pedidos" className="btn btn-primary">Novo Orçamento</a>
-          <a href="/filamentos" className="btn btn-outline">Cadastrar Filamento</a>
-          <a href="/clientes" className="btn btn-outline">Cadastrar Cliente</a>
-        </div>
-      </div>
+      
     </div>
   );
 };

@@ -1,12 +1,16 @@
+import Button from '../../components/Button';
 import React, { useState, useEffect } from 'react';
-import { FiSearch } from 'react-icons/fi';
+import DataTable from '../../components/DataTable';
 import { TbCalculator, TbFileInvoice } from 'react-icons/tb';
 import api from '../../services/api';
 import Modal from '../../components/Modal';
 import StatusBadge from '../../components/StatusBadge';
+import PageHeader from '../../components/PageHeader';
 
 const Orders = () => {
   const [pedidos, setPedidos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [clientes, setClientes] = useState([]);
   const [filamentos, setFilamentos] = useState([]);
 
@@ -31,15 +35,21 @@ const Orders = () => {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    const [pedRes, cliRes, filRes] = await Promise.all([
-      api.get('/pedidos'),
-      api.get('/clientes'),
-      api.get('/filamentos')
-    ]);
-    setPedidos(pedRes.data);
-    setClientes(cliRes.data);
-    setFilamentos(filRes.data);
+  async function fetchData() {
+    setLoading(true);
+    setError('');
+    try {
+      const [pedRes, cliRes, filRes] = await Promise.all([
+        api.get('/pedidos'), api.get('/clientes'), api.get('/filamentos')
+      ]);
+      setPedidos(pedRes.data);
+      setClientes(cliRes.data);
+      setFilamentos(filRes.data);
+    } catch {
+      setError('Não foi possível carregar os pedidos.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSimulate = async () => {
@@ -125,155 +135,71 @@ const Orders = () => {
     return true;
   });
 
+  const statusOptions = [
+    { value: 'ORCAMENTO', label: 'Orçamento' },
+    { value: 'APROVADO', label: 'Aprovado' },
+    { value: 'EM_IMPRESSAO', label: 'Em Impressão' },
+    { value: 'CONCLUIDO', label: 'Concluído' },
+    { value: 'ENTREGUE', label: 'Entregue' },
+    { value: 'CANCELADO', label: 'Cancelado' },
+  ];
+  const paymentOptions = [
+    { value: 'PENDENTE', label: 'Pendente' },
+    { value: 'SINAL_50', label: 'Sinal 50%' },
+    { value: 'PAGO', label: 'Pago' },
+  ];
+  const filters = [{ label: 'Campo de pesquisa', value: filtroCampo, onChange: value => { setFiltroCampo(value); setFiltroValor(''); }, options: [
+    { value: 'cliente', label: 'Cliente' }, { value: 'peca', label: 'Peça' },
+    { value: 'data', label: 'Data do Pedido' }, { value: 'status', label: 'Status' }, { value: 'pagamento', label: 'Pagamento' },
+  ] }];
+  if (filtroCampo === 'status' || filtroCampo === 'pagamento') {
+    filters.push({ label: filtroCampo === 'status' ? 'Filtrar status' : 'Filtrar pagamento', value: filtroValor, onChange: setFiltroValor, options: [
+      { value: '', label: filtroCampo === 'status' ? 'Todos os status' : 'Todos os pagamentos' },
+      ...(filtroCampo === 'status' ? statusOptions : paymentOptions),
+    ] });
+  }
+  const selectClass = 'cursor-pointer rounded-lg border border-border bg-surface px-2.5 py-2 text-xs text-text-secondary outline-none focus:border-brand focus:ring-2 focus:ring-brand/15';
+
   return (
     <div>
-      <div className="flex-between" style={{ marginBottom: '2rem', gap: '1rem', flexWrap: 'wrap' }}>
-        <h1>Orçamentos e Pedidos</h1>
-
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', background: 'var(--bg-card)', padding: '0.3rem', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
-            <FiSearch size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
-            <select
-              className="form-select"
-              style={{ border: 'none', background: 'var(--surface-hover)', fontWeight: '500', width: 'auto', paddingLeft: '0.2rem', paddingRight: '1.5rem' }}
-              value={filtroCampo}
-              onChange={(e) => { setFiltroCampo(e.target.value); setFiltroValor(''); }}
-            >
-              <option value="cliente">Cliente</option>
-              <option value="peca">Peça</option>
-              <option value="data">Data do Pedido</option>
-              <option value="status">Status</option>
-              <option value="pagamento">Pagamento</option>
-            </select>
-
-            <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
-
-            {(filtroCampo === 'cliente' || filtroCampo === 'peca') && (
-              <input
-                type="text"
-                className="form-input"
-                placeholder={`Buscar por ${filtroCampo}...`}
-                style={{ border: 'none', background: 'transparent', boxShadow: 'none', minWidth: '200px' }}
-                value={filtroValor}
-                onChange={(e) => setFiltroValor(e.target.value)}
-              />
-            )}
-
-            {filtroCampo === 'data' && (
-              <input
-                type="date"
-                className="form-input"
-                style={{ border: 'none', background: 'transparent', boxShadow: 'none' }}
-                value={filtroValor}
-                onChange={(e) => setFiltroValor(e.target.value)}
-              />
-            )}
-
-            {filtroCampo === 'status' && (
-              <select
-                className="form-select"
-                style={{ border: 'none', background: 'var(--surface-hover)', boxShadow: 'none', minWidth: '180px' }}
-                value={filtroValor}
-                onChange={(e) => setFiltroValor(e.target.value)}
-              >
-                <option value="">Todos os status</option>
-                <option value="ORCAMENTO">Orçamento</option>
-                <option value="APROVADO">Aprovado</option>
-                <option value="EM_IMPRESSAO">Em Impressão</option>
-                <option value="CONCLUIDO">Concluído</option>
-                <option value="ENTREGUE">Entregue</option>
-                <option value="CANCELADO">Cancelado</option>
-              </select>
-            )}
-
-            {filtroCampo === 'pagamento' && (
-              <select
-                className="form-select"
-                style={{ border: 'none', background: 'var(--surface-hover)', boxShadow: 'none', minWidth: '180px' }}
-                value={filtroValor}
-                onChange={(e) => setFiltroValor(e.target.value)}
-              >
-                <option value="">Todos os pagamentos</option>
-                <option value="PENDENTE">Pendente</option>
-                <option value="SINAL_50">Sinal 50%</option>
-                <option value="PAGO">Pago</option>
-              </select>
-            )}
-          </div>
-
-          <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
-            <TbFileInvoice size={20} /> Novo Orçamento
-          </button>
-        </div>
-      </div>
-
-      <div className="glass-card table-container">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Peça</th>
-              <th>Cliente</th>
-              <th>Filamento</th>
-              <th>Tempo/Peso</th>
-              <th>Preço Venda</th>
-              <th>Status</th>
-              <th>Pagamento</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pedidosFiltrados.map(p => (
-              <tr key={p._id}>
-                <td style={{ color: 'var(--text-muted)' }}>
-                  {p.createdAt ? new Date(p.createdAt).toLocaleDateString('pt-BR') : '-'}
-                </td>
-                <td style={{ fontWeight: '500' }}>{p.nome_peca}</td>
-                <td>{p.cliente_id?.nome}</td>
-                <td>{p.filamento_id?.nome}</td>
-                <td>{p.tempo_estimado_horas}h / {p.peso_estimado_g}g</td>
-                <td className="text-success" style={{ fontWeight: '600' }}>
-                  {formatCurrency(p.preco_final_cobrado || p.preco_sugerido)}
-                </td>
-                <td><StatusBadge status={p.status} /></td>
-                <td>
-                  <select
-                    className="form-select"
-                    style={{ padding: '0.3rem 0.5rem', width: 'auto' }}
-                    value={p.status_pagamento || 'PENDENTE'}
-                    onChange={(e) => updatePaymentStatus(p._id, e.target.value)}
-                  >
-                    <option value="PENDENTE">Pendente</option>
-                    <option value="SINAL_50">Sinal 50%</option>
-                    <option value="PAGO">Pago</option>
-                  </select>
-                </td>
-                <td>
-                  <select
-                    className="form-select"
-                    style={{ padding: '0.3rem 0.5rem', width: 'auto' }}
-                    value={p.status}
-                    onChange={(e) => updateStatus(p._id, e.target.value)}
-                  >
-                    <option value="ORCAMENTO">Orçamento</option>
-                    <option value="APROVADO">Aprovado</option>
-                    <option value="EM_IMPRESSAO">Em Impressão</option>
-                    <option value="CONCLUIDO">Concluído</option>
-                    <option value="ENTREGUE">Entregue</option>
-                    <option value="CANCELADO">Cancelado</option>
-                  </select>
-                </td>
-              </tr>
-            ))}
-            {pedidosFiltrados.length === 0 && (
-              <tr>
-                <td colSpan="9" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Nenhum pedido encontrado.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <PageHeader
+        title="Orçamentos e Pedidos"
+        subtitle="Crie orçamentos e acompanhe seus pedidos e pagamentos."
+        buttonLabel="Novo Orçamento"
+        buttonIcon={<TbFileInvoice size={20} />}
+        onButtonClick={() => setIsModalOpen(true)}
+      />
+      <DataTable
+        title="Lista de pedidos"
+        description="Acompanhe seus orçamentos, a produção e os pagamentos."
+        columns={[
+          { key: 'createdAt', label: 'Data', className: 'whitespace-nowrap text-text-secondary', render: p => p.createdAt ? new Date(p.createdAt).toLocaleDateString('pt-BR') : '-' },
+          { key: 'nome_peca', label: 'Peça', className: 'font-semibold' },
+          { key: 'cliente', label: 'Cliente', render: p => p.cliente_id?.nome || '-' },
+          { key: 'filamento', label: 'Filamento', render: p => p.filamento_id?.nome || '-' },
+          { key: 'tempo_peso', label: 'Tempo/Peso', className: 'whitespace-nowrap', render: p => `${p.tempo_estimado_horas}h / ${p.peso_estimado_g}g` },
+          { key: 'preco', label: 'Preço Venda', className: 'font-semibold text-success whitespace-nowrap', render: p => formatCurrency(p.preco_final_cobrado || p.preco_sugerido) },
+          { key: 'status', label: 'Status', render: p => <StatusBadge status={p.status} /> },
+          { key: 'pagamento', label: 'Pagamento', render: p => <select aria-label={`Pagamento de ${p.nome_peca}`} className={selectClass} value={p.status_pagamento || 'PENDENTE'} onChange={e => updatePaymentStatus(p._id, e.target.value)}>{paymentOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select> },
+          { key: 'actions', label: 'Ações', render: p => <select aria-label={`Status de ${p.nome_peca}`} className={selectClass} value={p.status} onChange={e => updateStatus(p._id, e.target.value)}>{statusOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select> },
+        ]}
+        rows={pedidosFiltrados}
+        getRowKey={p => p._id}
+        loading={loading}
+        loadingMessage="Carregando pedidos..."
+        emptyIcon={TbFileInvoice}
+        error={error}
+        onRetry={fetchData}
+        search={['cliente', 'peca', 'data'].includes(filtroCampo) ? {
+          value: filtroValor, onChange: setFiltroValor,
+          type: filtroCampo === 'data' ? 'date' : 'search',
+          label: `Pesquisar pedidos por ${filtroCampo}`,
+          placeholder: `Buscar por ${filtroCampo === 'peca' ? 'peça' : filtroCampo}...`,
+        } : undefined}
+        filters={filters}
+        emptyMessage={pedidos.length === 0 ? 'Nenhum pedido cadastrado.' : 'Nenhum pedido encontrado.'}
+        emptyDescription={pedidos.length === 0 ? 'Crie seu primeiro pedido no botão Novo Orçamento.' : 'Tente outro termo ou altere o filtro de pesquisa.'}
+      />
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Motor de Orçamentos">
         <form onSubmit={handleSubmit}>
@@ -355,9 +281,9 @@ const Orders = () => {
             )}
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={!calculoRealTime}>
+          <Button type="submit" fullWidth disabled={!calculoRealTime}>
             Salvar como Pedido / Orçamento
-          </button>
+          </Button>
         </form>
       </Modal>
     </div>
