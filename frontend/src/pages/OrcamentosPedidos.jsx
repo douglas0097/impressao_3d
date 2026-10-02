@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Calculator, Search } from 'lucide-react';
+import { FiSearch } from 'react-icons/fi';
+import { TbCalculator, TbFileInvoice } from 'react-icons/tb';
 import api from '../services/api';
 import Modal from '../components/Modal';
 import StatusBadge from '../components/StatusBadge';
@@ -132,10 +133,10 @@ const OrcamentosPedidos = () => {
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
 
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', background: 'var(--bg-card)', padding: '0.3rem', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
-            <Search size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
+            <FiSearch size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
             <select
               className="form-select"
-              style={{ border: 'none', background: '#1c2532', fontWeight: '500', width: 'auto', paddingLeft: '0.2rem', paddingRight: '1.5rem' }}
+              style={{ border: 'none', background: 'var(--surface-hover)', fontWeight: '500', width: 'auto', paddingLeft: '0.2rem', paddingRight: '1.5rem' }}
               value={filtroCampo}
               onChange={(e) => { setFiltroCampo(e.target.value); setFiltroValor(''); }}
             >
@@ -172,7 +173,7 @@ const OrcamentosPedidos = () => {
             {filtroCampo === 'status' && (
               <select
                 className="form-select"
-                style={{ border: 'none', background: '#1c2532', boxShadow: 'none', minWidth: '180px' }}
+                style={{ border: 'none', background: 'var(--surface-hover)', boxShadow: 'none', minWidth: '180px' }}
                 value={filtroValor}
                 onChange={(e) => setFiltroValor(e.target.value)}
               >
@@ -189,7 +190,7 @@ const OrcamentosPedidos = () => {
             {filtroCampo === 'pagamento' && (
               <select
                 className="form-select"
-                style={{ border: 'none', background: '#1c2532', boxShadow: 'none', minWidth: '180px' }}
+                style={{ border: 'none', background: 'var(--surface-hover)', boxShadow: 'none', minWidth: '180px' }}
                 value={filtroValor}
                 onChange={(e) => setFiltroValor(e.target.value)}
               >
@@ -202,7 +203,7 @@ const OrcamentosPedidos = () => {
           </div>
 
           <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
-            <Plus size={20} /> Novo Orçamento
+            <TbFileInvoice size={20} /> Novo Orçamento
           </button>
         </div>
       </div>
@@ -276,7 +277,7 @@ const OrcamentosPedidos = () => {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Motor de Orçamentos">
         <form onSubmit={handleSubmit}>
-          <div className="grid-cols-4" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="form-group">
               <label className="form-label">Cliente *</label>
               <select className="form-select" required value={formData.cliente_id} onChange={e => setFormData({ ...formData, cliente_id: e.target.value })}>
@@ -305,7 +306,7 @@ const OrcamentosPedidos = () => {
             <input className="form-input" required value={formData.nome_peca} onChange={e => setFormData({ ...formData, nome_peca: e.target.value })} placeholder="Ex: TCG GB case 105%" />
           </div>
 
-          <div className="grid-cols-4" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="form-group">
               <label className="form-label">Peso do Fatiador (g) *</label>
               <input type="number" step="0.1" className="form-input" required value={formData.peso_estimado_g} onChange={e => setFormData({ ...formData, peso_estimado_g: e.target.value })} />
@@ -317,9 +318,9 @@ const OrcamentosPedidos = () => {
           </div>
 
           {/* Painel de Cálculo em Tempo Real */}
-          <div style={{ background: 'rgba(59, 130, 246, 0.05)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-focus)', marginBottom: '1.5rem' }}>
+          <div style={{ background: 'var(--brand-soft)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-focus)', marginBottom: '1.5rem' }}>
             <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--primary)' }}>
-              <Calculator size={18} /> Simulação Financeira
+              <TbCalculator size={18} /> Simulação Financeira
               {loadingCalc && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}> (Calculando...)</span>}
             </h4>
 

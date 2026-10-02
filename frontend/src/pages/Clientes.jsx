@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, MessageCircle, Edit, Trash2, Search } from 'lucide-react';
+import { FiPlus, FiMessageCircle, FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
 import api from '../services/api';
 import Modal from '../components/Modal';
 
@@ -85,10 +85,10 @@ const Clientes = () => {
 
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', background: 'var(--bg-card)', padding: '0.3rem', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
-            <Search size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
+            <FiSearch size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
             <select
               className="form-select"
-              style={{ border: 'none', background: '#1c2532', fontWeight: '500', width: 'auto', paddingLeft: '0.2rem', paddingRight: '1.5rem' }}
+              style={{ border: 'none', background: 'var(--surface-hover)', fontWeight: '500', width: 'auto', paddingLeft: '0.2rem', paddingRight: '1.5rem' }}
               value={filtroCampo}
               onChange={(e) => { setFiltroCampo(e.target.value); setFiltroValor(''); }}
             >
@@ -109,7 +109,7 @@ const Clientes = () => {
           </div>
 
           <button className="btn btn-primary" onClick={() => { setEditingId(null); setFormData({ nome: '', telefone: '', instagram: '', observacoes: '' }); setIsModalOpen(true); }}>
-            <Plus size={20} /> Novo Cliente
+            <FiPlus size={20} /> Novo Cliente
           </button>
         </div>
       </div>
@@ -133,13 +133,13 @@ const Clientes = () => {
                 <td>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button className="btn btn-success" onClick={() => openWhatsApp(c.telefone)} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} title="WhatsApp">
-                      <MessageCircle size={16} /> WhatsApp
+                      <FiMessageCircle size={16} /> WhatsApp
                     </button>
                     <button className="btn btn-outline" onClick={() => handleEdit(c)} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} title="Editar">
-                      <Edit size={16} />
+                      <FiEdit2 size={16} />
                     </button>
-                    <button className="btn" onClick={() => handleDelete(c._id)} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', backgroundColor: 'var(--danger)', color: 'white' }} title="Excluir">
-                      <Trash2 size={16} />
+                    <button className="btn" onClick={() => handleDelete(c._id)} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', backgroundColor: 'var(--danger)', color: 'var(--text-primary)' }} title="Excluir">
+                      <FiTrash2 size={16} />
                     </button>
                   </div>
                 </td>

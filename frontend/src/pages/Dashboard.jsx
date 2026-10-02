@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, Package, CheckCircle } from 'lucide-react';
+import { TbCurrencyReal, TbTrendingUp, TbPrinter, TbCircleCheck } from 'react-icons/tb';
 import MetricCard from '../components/MetricCard';
 import api from '../services/api';
 
@@ -32,34 +32,34 @@ const Dashboard = () => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };
 
-  if (loading) return <div style={{ color: 'white' }}>Carregando dashboard...</div>;
+  if (loading) return <div style={{ color: 'var(--text-primary)' }}>Carregando dashboard...</div>;
 
   return (
     <div>
       <h1>Dashboard Operacional</h1>
       
-      <div className="grid-cols-4">
+      <div className="responsive-grid">
         <MetricCard 
           title="Faturamento Total" 
           value={formatCurrency(metrics.faturamento_total)} 
-          icon={<DollarSign size={24} />} 
+          icon={<TbCurrencyReal size={24} />}
           trend={{ isPositive: true, value: 'Mês atual' }}
         />
         <MetricCard 
           title="Lucro Estimado" 
           value={formatCurrency(metrics.lucro_estimado)} 
-          icon={<TrendingUp size={24} />} 
+          icon={<TbTrendingUp size={24} />}
           trend={{ isPositive: true, value: 'Margem saudável' }}
         />
         <MetricCard 
           title="Pedidos em Andamento" 
           value={metrics.pedidos_em_andamento} 
-          icon={<Package size={24} />} 
+          icon={<TbPrinter size={24} />}
         />
         <MetricCard 
           title="Pedidos Concluídos" 
           value={metrics.pedidos_concluidos} 
-          icon={<CheckCircle size={24} />} 
+          icon={<TbCircleCheck size={24} />}
         />
       </div>
 

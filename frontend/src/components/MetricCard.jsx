@@ -22,7 +22,7 @@ const MetricCard = ({ title, value, icon, trend }) => {
         )}
       </div>
       <div style={{
-        background: 'rgba(59, 130, 246, 0.1)',
+        background: 'var(--brand-soft)',
         color: 'var(--primary)',
         padding: '1rem',
         borderRadius: '50%',

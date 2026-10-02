@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { FiSearch } from 'react-icons/fi';
+import { TbCylinderPlus } from 'react-icons/tb';
 import api from '../services/api';
 import Modal from '../components/Modal';
 
@@ -50,10 +51,10 @@ const Filamentos = () => {
 
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', background: 'var(--bg-card)', padding: '0.3rem', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
-            <Search size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
+            <FiSearch size={16} style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }} />
             <select
               className="form-select"
-              style={{ border: 'none', background: '#1c2532', fontWeight: '500', width: 'auto', paddingLeft: '0.2rem', paddingRight: '1.5rem' }}
+              style={{ border: 'none', background: 'var(--surface-hover)', fontWeight: '500', width: 'auto', paddingLeft: '0.2rem', paddingRight: '1.5rem' }}
               value={filtroCampo}
               onChange={(e) => { setFiltroCampo(e.target.value); setFiltroValor(''); }}
             >
@@ -74,7 +75,7 @@ const Filamentos = () => {
           </div>
 
           <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
-            <Plus size={20} /> Adicionar Bobina
+            <TbCylinderPlus size={20} /> Adicionar Bobina
           </button>
         </div>
       </div>
@@ -97,7 +98,7 @@ const Filamentos = () => {
             {filamentosFiltrados.map(f => (
               <tr key={f._id}>
                 <td style={{ fontWeight: '500' }}>{f.nome}</td>
-                <td><span style={{ padding: '0.2rem 0.5rem', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', fontSize: '0.8rem' }}>{f.tipo_polimero}</span></td>
+                <td><span style={{ padding: '0.2rem 0.5rem', background: 'var(--surface-hover)', borderRadius: '4px', fontSize: '0.8rem' }}>{f.tipo_polimero}</span></td>
                 <td>{f.peso_total_g}g</td>
                 <td style={{ fontWeight: '600', color: (f.estoque_gramas != null ? f.estoque_gramas : f.peso_total_g) < 200 ? 'var(--danger)' : 'inherit' }}>
                   {f.estoque_gramas != null ? f.estoque_gramas : f.peso_total_g}g
@@ -125,7 +126,7 @@ const Filamentos = () => {
             <label className="form-label">Nome / Cor *</label>
             <input className="form-input" required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} placeholder="Ex: PLA Branco Pérola Silk" />
           </div>
-          <div className="grid-cols-4" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="form-group">
               <label className="form-label">Material *</label>
               <select className="form-select" value={formData.tipo_polimero} onChange={e => setFormData({...formData, tipo_polimero: e.target.value})}>
@@ -140,7 +141,7 @@ const Filamentos = () => {
               <input className="form-input" value={formData.marca} onChange={e => setFormData({...formData, marca: e.target.value})} />
             </div>
           </div>
-          <div className="grid-cols-4" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="form-group">
               <label className="form-label">Peso Total (g) *</label>
               <input type="number" className="form-input" required value={formData.peso_total_g} onChange={e => setFormData({...formData, peso_total_g: e.target.value})} />
@@ -150,7 +151,7 @@ const Filamentos = () => {
               <input type="number" step="0.01" className="form-input" required value={formData.preco_pago} onChange={e => setFormData({...formData, preco_pago: e.target.value})} />
             </div>
           </div>
-          <div className="grid-cols-4" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="form-group">
               <label className="form-label">Temp. Bico (°C)</label>
               <input type="number" className="form-input" value={formData.temperatura_bico} onChange={e => setFormData({...formData, temperatura_bico: e.target.value})} placeholder="Ex: 200" />

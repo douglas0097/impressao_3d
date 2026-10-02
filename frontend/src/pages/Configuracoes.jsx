@@ -49,7 +49,7 @@ const Configuracoes = () => {
     }
   };
 
-  if (loading) return <div style={{ color: 'white' }}>Carregando...</div>;
+  if (loading) return <div style={{ color: 'var(--text-primary)' }}>Carregando...</div>;
 
   return (
     <div>
@@ -62,7 +62,7 @@ const Configuracoes = () => {
         <form onSubmit={handleSubmit}>
           
           <h3 style={{ marginBottom: '1rem', color: 'var(--primary)' }}>Energia e Máquina</h3>
-          <div className="grid-cols-4">
+          <div className="responsive-grid">
             <div className="form-group">
               <label className="form-label">Custo Energia (R$/kWh)</label>
               <input type="number" step="0.01" name="custo_energia_kwh" value={config.custo_energia_kwh} onChange={handleChange} className="form-input" required />
@@ -78,7 +78,7 @@ const Configuracoes = () => {
           </div>
 
           <h3 style={{ margin: '1.5rem 0 1rem', color: 'var(--primary)' }}>Taxas e Margens (%)</h3>
-          <div className="grid-cols-4">
+          <div className="responsive-grid">
             <div className="form-group">
               <label className="form-label">Taxa Manutenção (%)</label>
               <input type="number" step="0.01" name="taxa_manutencao_pct" value={config.taxa_manutencao_pct} onChange={handleChange} className="form-input" required />

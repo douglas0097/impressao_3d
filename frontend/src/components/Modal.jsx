@@ -1,5 +1,5 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { FiX } from 'react-icons/fi';
 
 const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
@@ -13,7 +13,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
             onClick={onClose}
             style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
           >
-            <X size={24} />
+            <FiX size={24} />
           </button>
         </div>
         {children}
