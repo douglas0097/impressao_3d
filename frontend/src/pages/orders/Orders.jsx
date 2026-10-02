@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FiSearch } from 'react-icons/fi';
 import { TbCalculator, TbFileInvoice } from 'react-icons/tb';
-import api from '../services/api';
-import Modal from '../components/Modal';
-import StatusBadge from '../components/StatusBadge';
+import api from '../../services/api';
+import Modal from '../../components/Modal';
+import StatusBadge from '../../components/StatusBadge';
 
-const OrcamentosPedidos = () => {
+const Orders = () => {
   const [pedidos, setPedidos] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [filamentos, setFilamentos] = useState([]);
@@ -364,4 +364,4 @@ const OrcamentosPedidos = () => {
   );
 };
 
-export default OrcamentosPedidos;
+export default Orders;

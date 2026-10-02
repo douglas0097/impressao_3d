@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TbCurrencyReal, TbTrendingUp, TbPrinter, TbCircleCheck } from 'react-icons/tb';
-import MetricCard from '../components/MetricCard';
-import api from '../services/api';
+import MetricCard from '../../components/MetricCard';
+import api from '../../services/api';
 
 const Dashboard = () => {
   const [metrics, setMetrics] = useState({

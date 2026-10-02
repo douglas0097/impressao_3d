@@ -1,10 +1,10 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
-import Dashboard from '../pages/Dashboard';
-import OrcamentosPedidos from '../pages/OrcamentosPedidos';
-import Filamentos from '../pages/Filamentos';
-import Clientes from '../pages/Clientes';
-import Configuracoes from '../pages/Configuracoes';
+import Dashboard from '../pages/dashboard/Dashboard';
+import Orders from '../pages/orders/Orders';
+import Filaments from '../pages/filaments/Filaments';
+import Customers from '../pages/customers/Customers';
+import Settings from '../pages/settings/Settings';
 
 function AppRoutes() {
   return (
@@ -12,10 +12,10 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="pedidos" element={<OrcamentosPedidos />} />
-          <Route path="filamentos" element={<Filamentos />} />
-          <Route path="clientes" element={<Clientes />} />
-          <Route path="configuracoes" element={<Configuracoes />} />
+          <Route path="pedidos" element={<Orders />} />
+          <Route path="filamentos" element={<Filaments />} />
+          <Route path="clientes" element={<Customers />} />
+          <Route path="configuracoes" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>

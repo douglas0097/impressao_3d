@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FiSearch } from 'react-icons/fi';
 import { TbCylinderPlus } from 'react-icons/tb';
-import api from '../services/api';
-import Modal from '../components/Modal';
+import api from '../../services/api';
+import Modal from '../../components/Modal';
 
-const Filamentos = () => {
+const Filaments = () => {
   const [filamentos, setFilamentos] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filtroCampo, setFiltroCampo] = useState('nome');
@@ -168,4 +168,4 @@ const Filamentos = () => {
   );
 };
 
-export default Filamentos;
+export default Filaments;

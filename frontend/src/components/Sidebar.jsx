@@ -63,7 +63,7 @@ const Sidebar = ({ collapsed = false, onToggle }) => {
         </NavLink>
         <button type="button" onClick={onToggle} aria-expanded={!collapsed} aria-controls="sidebar-navigation"
           aria-label={collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'} title={collapsed ? 'Expandir menu' : 'Recolher menu'}
-          className="sidebar-collapse absolute -right-3.5 bottom-[-15px] z-[100] flex size-7 cursor-pointer items-center justify-center rounded-md border border-inherit shadow-sm">
+          className="sidebar-collapse absolute -right-3.5 -bottom-3.75 z-100 flex size-7 cursor-pointer items-center justify-center rounded-md border border-inherit shadow-sm">
           {collapsed ? <FiChevronsRight size={15} /> : <FiChevronsLeft size={15} />}
         </button>
       </header>

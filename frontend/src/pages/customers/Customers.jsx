@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiMessageCircle, FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
-import api from '../services/api';
-import Modal from '../components/Modal';
+import api from '../../services/api';
+import Modal from '../../components/Modal';
 
-const Clientes = () => {
+const Customers = () => {
   const [clientes, setClientes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -181,4 +181,4 @@ const Clientes = () => {
   );
 };
 
-export default Clientes;
+export default Customers;

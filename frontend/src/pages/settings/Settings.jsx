@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import api from '../../services/api';
 
-const Configuracoes = () => {
+const Settings = () => {
   const [config, setConfig] = useState({
     custo_energia_kwh: '',
     potencia_impressora_w: '',
@@ -105,4 +105,4 @@ const Configuracoes = () => {
   );
 };
 
-export default Configuracoes;
+export default Settings;
