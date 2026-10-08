@@ -25,6 +25,12 @@ export const createPedido = async (req, res) => {
       minutos
     } = req.body;
 
+    if (horas == null || minutos == null) {
+      return res.status(400).json({
+        message: 'Horas ou Minutos do tempo de impressão não informados'
+      });
+    }
+
     const tempo_estimado_horas = converterTempoParaHoras(horas, minutos);
 
     // Buscar o filamento
