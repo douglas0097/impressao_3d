@@ -1,6 +1,7 @@
 import Pedido from '../models/Pedido.js';
 import Filamento from '../models/Filamento.js';
 import Configuracao from '../models/Configuracao.js';
+import { converterTempoParaHoras } from '../utils/tempo.js';
 
 export const getPedidos = async (req, res) => {
   try {
@@ -20,8 +21,11 @@ export const createPedido = async (req, res) => {
       filamento_id,
       quantidade_pecas,
       peso_estimado_g,
-      tempo_estimado_horas
+      horas,
+      minutos
     } = req.body;
+
+    const tempo_estimado_horas = converterTempoParaHoras(horas, minutos);
 
     // Buscar o filamento
     const filamento = await Filamento.findById(filamento_id);
@@ -128,8 +132,17 @@ export const calcularOrcamento = async (req, res) => {
     const {
       filamento_id,
       peso_estimado_g,
-      tempo_estimado_horas
+      horas,
+      minutos
     } = req.body;
+
+    if (horas == null || minutos == null) {
+      return res.status(400).json({
+        message: 'Horas ou Minutos do tempo de impressão não informados'
+      });
+    }
+
+    const tempo_estimado_horas = converterTempoParaHoras(horas, minutos);
 
     if (!filamento_id) {
       return res.status(400).json({
@@ -140,12 +153,6 @@ export const calcularOrcamento = async (req, res) => {
     if (peso_estimado_g == null) {
       return res.status(400).json({
         message: 'Quantidade de filamento não informada'
-      });
-    }
-
-    if (tempo_estimado_horas == null) {
-      return res.status(400).json({
-        message: 'Tempo de impressão não informado'
       });
     }
 
@@ -181,6 +188,7 @@ export const calcularOrcamento = async (req, res) => {
   }
 };
 
+const arredondar = (valor) => Number(valor.toFixed(2));
 
 const calcularValoresOrcamento = ({
   filamento,
@@ -210,15 +218,13 @@ const calcularValoresOrcamento = ({
     config.margem_lucro_padrao;
 
   // 5. Preço de custo
-  const preco_custo =
-    custo_filamento +
-    (config.custo_energia * tempo_estimado_horas);
+  const preco_custo = (filamento.preco_kg / 1000) * peso_estimado_g + (config.custo_energia * tempo_estimado_horas);
 
   return {
-    custo_filamento,
-    custo_tempo_impressao,
-    custo_total_sem_lucro,
-    preco_sugerido,
-    preco_custo
+    custo_filamento: arredondar(custo_filamento),
+    custo_tempo_impressao: arredondar(custo_tempo_impressao),
+    custo_total_sem_lucro: arredondar(custo_total_sem_lucro),
+    preco_sugerido: arredondar(preco_sugerido),
+    preco_custo: arredondar(preco_custo)
   };
 };
