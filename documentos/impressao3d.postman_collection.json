@@ -1,0 +1,394 @@
+{
+	"info": {
+		"_postman_id": "4778aa11-dc3c-41fd-9ebe-dc82d2bd376d",
+		"name": "impressao3d",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42145517"
+	},
+	"item": [
+		{
+			"name": "pedido",
+			"item": [
+				{
+					"name": "Listar",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{dominio}}pedidos/",
+							"host": [
+								"{{dominio}}pedidos"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Calcular Orcamento",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"filamento_id\":\"6ab2141b37b6555122ad647a\",\n    \"peso_estimado_g\": 60,\n    \"horas\":2,\n    \"minutos\":0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dominio}}pedidos/calcular",
+							"host": [
+								"{{dominio}}pedidos"
+							],
+							"path": [
+								"calcular"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cliente_id\": \"6ab213ea37b6555122ad6479\",\n  \"nome_peca\": \"Suporte para celular\",\n  \"link_modelo\": \"https://www.printables.com/model/123456\",\n  \"filamento_id\": \"6ab2141b37b6555122ad647a\",\n  \"quantidade_pecas\": 2,\n  \"peso_estimado_g\": 85,\n  \"horas\": 1,\n  \"minutos\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dominio}}pedidos/",
+							"host": [
+								"{{dominio}}pedidos"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome_peca\": \"Nome Peça Atualizado\",\n    \"quantidade_pecas\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dominio}}pedidos/6ac83f0468b1a1771c04d0f6",
+							"host": [
+								"{{dominio}}pedidos"
+							],
+							"path": [
+								"6ac83f0468b1a1771c04d0f6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{dominio}}pedidos/6ab221c0f1f2ccad55368bc7",
+							"host": [
+								"{{dominio}}pedidos"
+							],
+							"path": [
+								"6ab221c0f1f2ccad55368bc7"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "filamento",
+			"item": [
+				{
+					"name": "Listar",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dominio}}filamentos/",
+							"host": [
+								"{{dominio}}filamentos"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Editar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"marca\": \"Marca Dezano\",\n        \"cor\": \"Cor Vilarejo azulado\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dominio}}filamentos/6ab2141b37b6555122ad647a",
+							"host": [
+								"{{dominio}}filamentos"
+							],
+							"path": [
+								"6ab2141b37b6555122ad647a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"PLA Premium\",\n  \"marca\": \"Voolt3D\",\n  \"tipo_polimero\": \"PLA\",\n  \"cor\": \"Preto\",\n  \"peso_total_g\": 1000,\n  \"preco_kg\": 89.90,\n  \"temperatura_bico\": 210,\n  \"temperatura_mesa\": 60,\n  \"estoque_gramas\": 1000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dominio}}filamentos/",
+							"host": [
+								"{{dominio}}filamentos"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dominio}}filamentos/6ab222bdf1f2ccad55368bc8",
+							"host": [
+								"{{dominio}}filamentos"
+							],
+							"path": [
+								"6ab222bdf1f2ccad55368bc8"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "configuracao",
+			"item": [
+				{
+					"name": "Listar",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dominio}}configuracoes",
+							"host": [
+								"{{dominio}}configuracoes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Editar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"custo_energia\": 0.75,\n  \"taxa_manutencao\": 2.25,\n  \"taxa_retrabalho_pct\": 30,\n  \"margem_lucro_padrao_pct\": 40\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dominio}}configuracoes/",
+							"host": [
+								"{{dominio}}configuracoes"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "cliente",
+			"item": [
+				{
+					"name": "Listar",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dominio}}clientes/",
+							"host": [
+								"{{dominio}}clientes"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"João Silva\",\n  \"telefone\": \"83999998888\",\n  \"instagram\": \"@joaosilva\",\n  \"observacoes\": \"Cliente interessado em produtos personalizados de impressão 3D.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dominio}}clientes/",
+							"host": [
+								"{{dominio}}clientes"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"João Silva Atualizado\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dominio}}clientes/6ac847f368b1a1771c04d0f8",
+							"host": [
+								"{{dominio}}clientes"
+							],
+							"path": [
+								"6ac847f368b1a1771c04d0f8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{dominio}}clientes/6ab213ea37b6555122ad6479",
+							"host": [
+								"{{dominio}}clientes"
+							],
+							"path": [
+								"6ab213ea37b6555122ad6479"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
