@@ -2,7 +2,7 @@ import Button from './Button';
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FiMoon, FiSun, FiChevronsLeft, FiChevronsRight, FiLogOut } from 'react-icons/fi';
-import { TbLayoutDashboard, TbUsers, TbFileInvoice, TbSettings } from 'react-icons/tb';
+import { TbLayoutDashboard, TbUsers, TbFileInvoice, TbSettings, TbCalculator } from 'react-icons/tb';
 import { GiWireCoil } from 'react-icons/gi';
 import BrandIsotype from './BrandIsotype';
 
@@ -10,6 +10,7 @@ const groups = [
   { label: 'Principal', items: [
     { to: '/', icon: TbLayoutDashboard, label: 'Dashboard' },
     { to: '/clientes', icon: TbUsers, label: 'Clientes' },
+    { to: '/calculadora', icon: TbCalculator, label: 'Calculadora de orçamento' },
     { to: '/pedidos', icon: TbFileInvoice, label: 'Or\u00e7amentos e pedidos' },
     { to: '/filamentos', icon: GiWireCoil, label: 'Filamentos' },
   ] },
