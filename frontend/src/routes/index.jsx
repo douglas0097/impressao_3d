@@ -6,11 +6,13 @@ import Filaments from '../pages/filaments/Filaments';
 import Customers from '../pages/customers/Customers';
 import Settings from '../pages/settings/Settings';
 import Calculator from '../pages/calculator/Calculator';
+import AuthLogin from '../pages/authLogin/AuthLogin';
 
 function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/login" element={<AuthLogin />} />
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="pedidos" element={<Orders />} />

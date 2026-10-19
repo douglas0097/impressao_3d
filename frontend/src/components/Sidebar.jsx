@@ -49,7 +49,7 @@ const Sidebar = ({ collapsed = false, onToggle }) => {
       ['token', 'authToken', 'access_token', 'refresh_token', 'user'].forEach(key => localStorage.removeItem(key));
       sessionStorage.clear();
     } finally {
-      window.location.assign('/');
+      window.location.assign('/login');
     }
   };
 
