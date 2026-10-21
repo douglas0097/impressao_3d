@@ -1,15 +1,12 @@
 const currency = (value) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const rows = [
-  ["material", "Filamento"],
-  ["energia", "Energia elétrica"],
-  ["maquina", "Máquina"],
-  ["maoObra", "Mão de obra"],
-  ["manutencao", "Manutenção"],
-  ["retrabalho", "Retrabalho"],
-  ["total", "Custo total"],
-  ["lucro", "Lucro antes do desconto"],
-  ["venda", "Preço de venda"],
+  ["material", "Custo do Filamento (c/ retrabalho)"],
+  ["custoTempo", "Custo do Tempo (energia + manutenção)"],
+  ["precoCusto", "Preço de Custo Real"],
+  ["total", "Custo Total sem Lucro"],
+  ["lucro", "Margem de Lucro"],
+  ["venda", "Preço Sugerido"],
   ["desconto", "Desconto"],
 ];
 

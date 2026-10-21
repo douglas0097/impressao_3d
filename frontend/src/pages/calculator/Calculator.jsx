@@ -15,19 +15,17 @@ import {
 } from "../../utils/numeroLocalizado";
 
 const fields = [
-  ["peso", "Peso total utilizado (g)", null],
-  ["horas", "Tempo total de impressão (horas)", null],
-  ["tarifa", "Tarifa de energia (R$/kWh)", "custo_energia_kwh"],
-  ["potencia", "Potência da impressora (W)", "potencia_impressora_w"],
-  ["maquina", "Custo da máquina (R$/hora)", "custo_hora_impressao_adicional"],
-  ["maoObra", "Mão de obra total (R$)", null],
-  ["manutencao", "Manutenção (%)", "taxa_manutencao_pct"],
-  ["retrabalho", "Retrabalho (%)", "taxa_retrabalho_pct"],
-  ["margem", "Lucro sobre o custo (%)", "margem_lucro_padrao_pct"],
+  ["peso", "Peso do filamento (g)", null],
+  ["horas", "Tempo - Horas", null],
+  ["minutos", "Tempo - Minutos", null],
+  ["custo_energia", "Custo de energia (R$/hora)", "custo_energia"],
+  ["taxa_manutencao", "Taxa de manutenção (R$/hora)", "taxa_manutencao"],
+  ["taxa_retrabalho_pct", "Taxa de retrabalho (%)", "taxa_retrabalho_pct"],
+  ["margem_lucro_padrao_pct", "Margem de lucro (%)", "margem_lucro_padrao_pct"],
   ["desconto", "Desconto (R$)", null],
 ];
 const initial = Object.fromEntries(
-  fields.map(([key]) => [key, ["peso", "horas"].includes(key) ? "" : "0,00"]),
+  fields.map(([key]) => [key, ["peso", "horas", "minutos"].includes(key) ? "" : "0,00"]),
 );
 export default function Calculator() {
   const [filamentos, setFilamentos] = useState([]);
@@ -83,12 +81,12 @@ export default function Calculator() {
 
   let result = null;
   let validation = "";
-  if (selected && values.peso !== "" && values.horas !== "") {
+  if (selected && values.peso !== "" && (values.horas !== "" || values.minutos !== "")) {
     try {
       result = calcularOrcamento(
         filamentos.find((item) => item._id === selected),
         Object.fromEntries(
-          fields.map(([key]) => [key, parseNumeroLocalizado(values[key])]),
+          fields.map(([key]) => [key, parseNumeroLocalizado(values[key]) || 0]),
         ),
       );
     } catch (failure) {

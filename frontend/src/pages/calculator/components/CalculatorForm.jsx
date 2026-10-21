@@ -63,9 +63,7 @@ export default function CalculatorForm({ filamentos, selected, values, fields, o
         id="calculator-format"
         className="mt-4 text-xs text-text-secondary"
       >
-        Use vírgula para decimais (ex.: 1,50 hora = 1h30). Lucro
-        calculado como acréscimo sobre o custo. Manutenção e
-        retrabalho incidem sobre filamento, energia e máquina.
+        Informe o tempo em horas e minutos. O custo do filamento inclui a taxa de retrabalho, e o custo do tempo inclui energia e manutenção.
       </p>
       <p className="mt-3 text-xs text-text-secondary">
         Os ajustes valem apenas para esta simulação.

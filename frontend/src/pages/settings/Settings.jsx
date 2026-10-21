@@ -1,4 +1,4 @@
-﻿import Input from '../../components/Input';
+import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { useState, useEffect } from 'react';
 import { FiZap, FiPercent, FiSave, FiSettings } from 'react-icons/fi';
@@ -8,14 +8,13 @@ import { formatNumeroLocalizado, parseNumeroLocalizado } from '../../utils/numer
 
 const sections = [
   {
-    id: 'energia',
-    title: 'Energia e máquina',
-    description: 'Defina os custos de energia e operação da impressora.',
+    id: 'operacao',
+    title: 'Custos operacionais por hora',
+    description: 'Defina os custos de energia e manutenção cobrados por hora de impressão.',
     icon: FiZap,
     fields: [
-      { name: 'custo_energia_kwh', label: 'Custo de energia (R$/kWh)', hint: 'Valor cobrado por quilowatt-hora.', step: '0.01' },
-      { name: 'potencia_impressora_w', label: 'Potência da impressora (W)', hint: 'Potência utilizada no cálculo do consumo.', step: '1' },
-      { name: 'custo_hora_impressao_adicional', label: 'Custo fixo extra (R$/hora)', hint: 'Custo adicional por hora de impressão.', step: '0.01' },
+      { name: 'custo_energia', label: 'Custo de energia (R$/hora)', hint: 'Custo de energia elétrica consumida por hora de impressão.', step: '0.01' },
+      { name: 'taxa_manutencao', label: 'Taxa de manutenção (R$/hora)', hint: 'Custo de manutenção e desgaste da máquina por hora.', step: '0.01' },
     ],
   },
   {
@@ -24,9 +23,8 @@ const sections = [
     description: 'Ajuste os percentuais usados na formação dos orçamentos.',
     icon: FiPercent,
     fields: [
-      { name: 'taxa_manutencao_pct', label: 'Taxa de manutenção (%)', hint: 'Percentual reservado para manutenção.', step: '0.01' },
-      { name: 'taxa_retrabalho_pct', label: 'Taxa de retrabalho (%)', hint: 'Percentual para cobrir perdas e reimpressões.', step: '0.01' },
-      { name: 'margem_lucro_padrao_pct', label: 'Margem de lucro padrão (%)', hint: 'Margem aplicada por padrão aos orçamentos.', step: '0.01' },
+      { name: 'taxa_retrabalho_pct', label: 'Taxa de retrabalho (%)', hint: 'Percentual para cobrir perdas, suportes e reimpressões.', step: '0.01' },
+      { name: 'margem_lucro_padrao_pct', label: 'Margem de lucro padrão (%)', hint: 'Margem de lucro aplicada sobre o custo total para sugerir o preço de venda.', step: '0.01' },
     ],
   },
 ];

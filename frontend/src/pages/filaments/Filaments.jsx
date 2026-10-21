@@ -16,7 +16,7 @@ const Filaments = () => {
   const [filtroCampo, setFiltroCampo] = useState('nome');
   const [filtroValor, setFiltroValor] = useState('');
   const [formData, setFormData] = useState({ 
-    nome: '', marca: '', tipo_polimero: 'PLA', cor: '', peso_total_g: 1000, preco_pago: 100, temperatura_bico: '', temperatura_mesa: ''
+    nome: '', marca: '', tipo_polimero: 'PLA', cor: '', peso_total_g: 1000, preco_kg: 100, preco_pago: 100, temperatura_bico: '', temperatura_mesa: ''
   });
 
   useEffect(() => {
@@ -38,9 +38,15 @@ const Filaments = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await api.post('/filamentos', formData);
+    const preco = Number(formData.preco_kg ?? formData.preco_pago);
+    const payload = {
+      ...formData,
+      preco_kg: preco,
+      preco_pago: preco
+    };
+    await api.post('/filamentos', payload);
     setIsModalOpen(false);
-    setFormData({ nome: '', marca: '', tipo_polimero: 'PLA', cor: '', peso_total_g: 1000, preco_pago: 100, temperatura_bico: '', temperatura_mesa: '' });
+    setFormData({ nome: '', marca: '', tipo_polimero: 'PLA', cor: '', peso_total_g: 1000, preco_kg: 100, preco_pago: 100, temperatura_bico: '', temperatura_mesa: '' });
     fetchFilamentos();
   };
 
@@ -77,8 +83,8 @@ const Filaments = () => {
           { key: 'estoque_gramas', label: 'Estoque Atual (g)', render: f => <span className={`font-semibold ${(f.estoque_gramas ?? f.peso_total_g) < 200 ? 'text-danger' : 'text-text-primary'}`}>{f.estoque_gramas ?? f.peso_total_g}g</span> },
           { key: 'temperatura_bico', label: 'Temp. Bico (°C)', render: f => f.temperatura_bico ? `${f.temperatura_bico}°C` : '-' },
           { key: 'temperatura_mesa', label: 'Temp. Mesa (°C)', render: f => f.temperatura_mesa ? `${f.temperatura_mesa}°C` : '-' },
-          { key: 'preco_pago', label: 'Preço Pago', className: 'whitespace-nowrap', render: f => formatCurrency(f.preco_pago) },
-          { key: 'custo_por_grama', label: 'Custo/g', className: 'font-semibold text-success whitespace-nowrap', render: f => formatCurrency(f.custo_por_grama) },
+          { key: 'preco_kg', label: 'Preço/kg', className: 'whitespace-nowrap', render: f => formatCurrency(f.preco_kg != null ? f.preco_kg : f.preco_pago) },
+          { key: 'custo_por_grama', label: 'Custo/g', className: 'font-semibold text-success whitespace-nowrap', render: f => formatCurrency(f.custo_por_grama ?? ((f.preco_kg || f.preco_pago || 0) / 1000)) },
         ]}
         rows={filamentosFiltrados}
         getRowKey={f => f._id}
@@ -123,8 +129,8 @@ const Filaments = () => {
               <Input id="filaments-field-4" type="number" required value={formData.peso_total_g} onChange={e => setFormData({...formData, peso_total_g: e.target.value})} />
             </div>
             <div className="form-group">
-              <label htmlFor="filaments-field-5" className="form-label">Preço Pago (R$) *</label>
-              <Input id="filaments-field-5" type="number" step="0.01" required value={formData.preco_pago} onChange={e => setFormData({...formData, preco_pago: e.target.value})} />
+              <label htmlFor="filaments-field-5" className="form-label">Preço por Kg (R$) *</label>
+              <Input id="filaments-field-5" type="number" step="0.01" required value={formData.preco_kg ?? formData.preco_pago} onChange={e => setFormData({...formData, preco_kg: e.target.value, preco_pago: e.target.value})} />
             </div>
           </div>
           <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>

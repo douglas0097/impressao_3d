@@ -28,7 +28,8 @@ const Orders = () => {
     filamento_id: '',
     quantidade_pecas: 1,
     peso_estimado_g: '',
-    tempo_estimado_horas: '',
+    horas: '',
+    minutos: '',
   });
 
   const [calculoRealTime, setCalculoRealTime] = useState(null);
@@ -55,13 +56,14 @@ const Orders = () => {
   };
 
   const handleSimulate = async () => {
-    if (!formData.filamento_id || !formData.peso_estimado_g || !formData.tempo_estimado_horas) return;
+    if (!formData.filamento_id || !formData.peso_estimado_g || formData.horas === '' || formData.minutos === '') return;
     setLoadingCalc(true);
     try {
       const res = await api.post('/pedidos/calcular', {
         filamento_id: formData.filamento_id,
-        peso_estimado_g: formData.peso_estimado_g,
-        tempo_estimado_horas: formData.tempo_estimado_horas
+        peso_estimado_g: Number(formData.peso_estimado_g),
+        horas: Number(formData.horas),
+        minutos: Number(formData.minutos)
       });
       setCalculoRealTime(res.data);
     } catch (error) {
@@ -76,7 +78,7 @@ const Orders = () => {
       handleSimulate();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
-  }, [formData.filamento_id, formData.peso_estimado_g, formData.tempo_estimado_horas]);
+  }, [formData.filamento_id, formData.peso_estimado_g, formData.horas, formData.minutos]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -91,13 +93,19 @@ const Orders = () => {
     }
 
     const payload = {
-      ...formData,
-      ...calculoRealTime, // Adiciona os custos calculados
+      cliente_id: formData.cliente_id,
+      nome_peca: formData.nome_peca,
+      link_modelo: formData.link_modelo,
+      filamento_id: formData.filamento_id,
+      quantidade_pecas: Number(formData.quantidade_pecas) || 1,
+      peso_estimado_g: Number(formData.peso_estimado_g),
+      horas: Number(formData.horas),
+      minutos: Number(formData.minutos),
       preco_final_cobrado: calculoRealTime?.preco_sugerido
     };
     await api.post('/pedidos', payload);
     setIsModalOpen(false);
-    setFormData({ cliente_id: '', nome_peca: '', link_modelo: '', filamento_id: '', quantidade_pecas: 1, peso_estimado_g: '', tempo_estimado_horas: '' });
+    setFormData({ cliente_id: '', nome_peca: '', link_modelo: '', filamento_id: '', quantidade_pecas: 1, peso_estimado_g: '', horas: '', minutos: '' });
     setCalculoRealTime(null);
     fetchData();
   };
@@ -218,9 +226,10 @@ const Orders = () => {
                 <option value="">Selecione um filamento...</option>
                 {filamentos.map(f => {
                   const estoque = f.estoque_gramas != null ? f.estoque_gramas : f.peso_total_g;
+                  const precoKg = f.preco_kg != null ? f.preco_kg : (f.preco_pago ?? 0);
                   return (
                     <option key={f._id} value={f._id}>
-                      {f.nome} - Estoque: {estoque}g (R${f.custo_por_grama?.toFixed(3)}/g)
+                      {f.nome} - Estoque: {estoque}g (R$ {precoKg.toFixed(2)}/kg)
                     </option>
                   );
                 })}
@@ -233,14 +242,18 @@ const Orders = () => {
             <Input id="orders-field-3" required value={formData.nome_peca} onChange={e => setFormData({ ...formData, nome_peca: e.target.value })} placeholder="Ex: TCG GB case 105%" />
           </div>
 
-          <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="responsive-grid" style={{ gridTemplateColumns: '1.2fr 1fr 1fr' }}>
             <div className="form-group">
               <label htmlFor="orders-field-4" className="form-label">Peso do Fatiador (g) *</label>
-              <Input id="orders-field-4" type="number" step="0.1" required value={formData.peso_estimado_g} onChange={e => setFormData({ ...formData, peso_estimado_g: e.target.value })} />
+              <Input id="orders-field-4" type="number" step="0.1" required value={formData.peso_estimado_g} onChange={e => setFormData({ ...formData, peso_estimado_g: e.target.value })} placeholder="Ex: 85" />
             </div>
             <div className="form-group">
-              <label htmlFor="orders-field-5" className="form-label">Tempo do Fatiador (horas) *</label>
-              <Input id="orders-field-5" type="number" step="0.1" required value={formData.tempo_estimado_horas} onChange={e => setFormData({ ...formData, tempo_estimado_horas: e.target.value })} />
+              <label htmlFor="orders-field-5" className="form-label">Tempo - Horas *</label>
+              <Input id="orders-field-5" type="number" min="0" required value={formData.horas} onChange={e => setFormData({ ...formData, horas: e.target.value })} placeholder="Ex: 3" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="orders-field-6" className="form-label">Tempo - Minutos *</label>
+              <Input id="orders-field-6" type="number" min="0" max="59" required value={formData.minutos} onChange={e => setFormData({ ...formData, minutos: e.target.value })} placeholder="Ex: 45" />
             </div>
           </div>
 
@@ -254,16 +267,16 @@ const Orders = () => {
             {calculoRealTime ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
                 <div className="flex-between">
-                  <span style={{ color: 'var(--text-muted)' }}>Custo Filamento:</span>
+                  <span style={{ color: 'var(--text-muted)' }}>Custo Filamento (c/ retrabalho):</span>
                   <span>{formatCurrency(calculoRealTime.custo_filamento)}</span>
                 </div>
                 <div className="flex-between">
-                  <span style={{ color: 'var(--text-muted)' }}>Custo Tempo + Energia:</span>
-                  <span>{formatCurrency(calculoRealTime.custo_tempo_energia)}</span>
+                  <span style={{ color: 'var(--text-muted)' }}>Custo Tempo (energia + manutenção):</span>
+                  <span>{formatCurrency(calculoRealTime.custo_tempo_impressao)}</span>
                 </div>
                 <div className="flex-between">
-                  <span style={{ color: 'var(--text-muted)' }}>Adicionais (Manut/Retrabalho):</span>
-                  <span>{formatCurrency(calculoRealTime.custo_manutencao + calculoRealTime.custo_retrabalho)}</span>
+                  <span style={{ color: 'var(--text-muted)' }}>Preço de Custo Real:</span>
+                  <span style={{ fontWeight: '500' }}>{formatCurrency(calculoRealTime.preco_custo)}</span>
                 </div>
                 <hr style={{ borderColor: 'var(--border-light)', margin: '0.5rem 0' }} />
                 <div className="flex-between">
@@ -277,7 +290,7 @@ const Orders = () => {
               </div>
             ) : (
               <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
-                Preencha filamento, peso e tempo para visualizar a simulação de custos automaticamente.
+                Preencha filamento, peso, horas e minutos para visualizar a simulação de custos automaticamente.
               </p>
             )}
           </div>

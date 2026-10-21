@@ -74,7 +74,8 @@ export const createPedido = async (req, res) => {
       custo_tempo_impressao: valores.custo_tempo_impressao,
       custo_total_sem_lucro: valores.custo_total_sem_lucro,
       preco_sugerido: valores.preco_sugerido,
-      preco_custo: valores.preco_custo
+      preco_custo: valores.preco_custo,
+      preco_final_cobrado: req.body.preco_final_cobrado || valores.preco_sugerido
     });
 
     const saved = await pedido.save();
@@ -202,15 +203,19 @@ const calcularValoresOrcamento = ({
   tempo_estimado_horas,
   config
 }) => {
+  const precoKg = filamento.preco_kg != null ? filamento.preco_kg : (filamento.preco_pago ?? 0);
+  const taxaRetrabalho = config.taxa_retrabalho != null ? config.taxa_retrabalho : (1 + (config.taxa_retrabalho_pct || 0) / 100);
+  const margemLucro = config.margem_lucro_padrao != null ? config.margem_lucro_padrao : (1 + (config.margem_lucro_padrao_pct || 0) / 100);
+
   // 1. Custo do filamento
   const custo_filamento =
-    (filamento.preco_kg / 1000) *
+    (precoKg / 1000) *
     peso_estimado_g *
-    config.taxa_retrabalho;
+    taxaRetrabalho;
 
   // 2. Custo do tempo de impressão (2.10 + 0.75) * 1.9
   const custo_tempo_impressao =
-    (config.taxa_manutencao + config.custo_energia) *
+    ((config.taxa_manutencao || 0) + (config.custo_energia || 0)) *
     tempo_estimado_horas;
 
   // 3. Custo total sem lucro
@@ -221,10 +226,10 @@ const calcularValoresOrcamento = ({
   // 4. Preço sugerido
   const preco_sugerido =
     custo_total_sem_lucro *
-    config.margem_lucro_padrao;
+    margemLucro;
 
   // 5. Preço de custo
-  const preco_custo = (filamento.preco_kg / 1000) * peso_estimado_g + (config.custo_energia * tempo_estimado_horas);
+  const preco_custo = (precoKg / 1000) * peso_estimado_g + ((config.custo_energia || 0) * tempo_estimado_horas);
 
   return {
     custo_filamento: arredondar(custo_filamento),
