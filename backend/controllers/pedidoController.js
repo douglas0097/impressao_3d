@@ -80,6 +80,11 @@ export const createPedido = async (req, res) => {
 
     const saved = await pedido.save();
 
+    // Atualizar estoque do filamento subtraindo o peso estimado da peça
+    const estoqueAtual = filamento.estoque_gramas != null ? filamento.estoque_gramas : 0;
+    filamento.estoque_gramas = estoqueAtual - Number(peso_estimado_g);
+    await filamento.save();
+
     res.status(201).json(saved);
 
   } catch (error) {
@@ -213,7 +218,7 @@ const calcularValoresOrcamento = ({
     peso_estimado_g *
     taxaRetrabalho;
 
-  // 2. Custo do tempo de impressão (2.10 + 0.75) * 1.9
+  // 2. Custo do tempo de impressão
   const custo_tempo_impressao =
     ((config.taxa_manutencao || 0) + (config.custo_energia || 0)) *
     tempo_estimado_horas;
