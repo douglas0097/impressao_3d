@@ -203,13 +203,13 @@ const calcularValoresOrcamento = ({
   tempo_estimado_horas,
   config
 }) => {
-  const precoKg = filamento.preco_kg != null ? filamento.preco_kg : (filamento.preco_pago ?? 0);
+  const custo_por_grama = filamento.custo_por_grama != null ? filamento.custo_por_grama : (filamento.custo_por_grama ?? 0);
   const taxaRetrabalho = config.taxa_retrabalho != null ? config.taxa_retrabalho : (1 + (config.taxa_retrabalho_pct || 0) / 100);
   const margemLucro = config.margem_lucro_padrao != null ? config.margem_lucro_padrao : (1 + (config.margem_lucro_padrao_pct || 0) / 100);
 
   // 1. Custo do filamento
   const custo_filamento =
-    (precoKg / 1000) *
+    custo_por_grama *
     peso_estimado_g *
     taxaRetrabalho;
 
@@ -229,7 +229,7 @@ const calcularValoresOrcamento = ({
     margemLucro;
 
   // 5. Preço de custo
-  const preco_custo = (precoKg / 1000) * peso_estimado_g + ((config.custo_energia || 0) * tempo_estimado_horas);
+  const preco_custo = custo_por_grama * peso_estimado_g + ((config.custo_energia || 0) * tempo_estimado_horas);
 
   return {
     custo_filamento: arredondar(custo_filamento),
