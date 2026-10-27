@@ -6,6 +6,7 @@ import OrderDetails from '../pages/orders/OrderDetails';
 import Filaments from '../pages/filaments/Filaments';
 import FilamentDetails from '../pages/filaments/FilamentDetails';
 import Customers from '../pages/customers/Customers';
+import CustomerDetails from '../pages/customers/CustomerDetails';
 import Settings from '../pages/settings/Settings';
 import Calculator from '../pages/calculator/Calculator';
 import AuthLogin from '../pages/authLogin/AuthLogin';
@@ -23,6 +24,7 @@ function AppRoutes() {
           <Route path="filamentos" element={<Filaments />} />
           <Route path="filamentos/:id" element={<FilamentDetails />} />
           <Route path="clientes" element={<Customers />} />
+          <Route path="clientes/:id" element={<CustomerDetails />} />
           <Route path="configuracoes" element={<Settings />} />
         </Route>
       </Routes>

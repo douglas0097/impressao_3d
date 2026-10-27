@@ -1,4 +1,4 @@
-﻿import { FiArrowLeft, FiEdit2, FiTrash2, FiCheckCircle, FiAlertCircle, FiX } from 'react-icons/fi';
+import { FiArrowLeft, FiEdit2, FiTrash2, FiCheckCircle, FiAlertCircle, FiX } from 'react-icons/fi';
 import PageHeader from '../PageHeader';
 import Button from '../Button';
 import Modal from '../Modal';
@@ -21,10 +21,10 @@ export function DetailsCard({ title, subtitle, editing, editLabel = 'Editar', bu
         <h2 className="mb-0 break-words text-lg font-semibold">{title}</h2>
         {subtitle && <p className="mt-1 text-sm text-text-secondary">{subtitle}</p>}
       </div>
-      <div className="flex shrink-0 flex-wrap gap-2">
-        <Button variant="outline" disabled={busy} onClick={onEdit}>{editing ? <FiX size={16} /> : <FiEdit2 size={16} />}{editing ? 'Cancelar edição' : editLabel}</Button>
-        <Button variant="danger-ghost" disabled={busy} onClick={onDelete}><FiTrash2 size={16} />Excluir</Button>
-      </div>
+      {(onEdit || onDelete) && <div className="flex shrink-0 flex-wrap gap-2">
+        {onEdit && <Button variant="outline" disabled={busy} onClick={onEdit}>{editing ? <FiX size={16} /> : <FiEdit2 size={16} />}{editing ? 'Cancelar edição' : editLabel}</Button>}
+        {onDelete && <Button variant="danger-ghost" disabled={busy} onClick={onDelete}><FiTrash2 size={16} />Excluir</Button>}
+      </div>}
     </header>
     {children}
   </article>;

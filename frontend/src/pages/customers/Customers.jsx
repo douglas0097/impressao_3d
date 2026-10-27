@@ -1,15 +1,17 @@
+import { useNavigate } from 'react-router-dom';
 import Input from '../../components/Input';
 import Textarea from '../../components/Textarea';
 import Button from '../../components/Button';
 import React, { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
-import { FiPlus, FiMessageCircle, FiEdit2, FiTrash2, FiPhone, FiInstagram } from 'react-icons/fi';
+import { FiPlus, FiMessageCircle, FiEdit2, FiTrash2, FiPhone, FiInstagram, FiEye } from 'react-icons/fi';
 import DataTable from '../../components/DataTable';
 import api from '../../services/api';
 import Modal from '../../components/Modal';
 import { mascaraTelefone } from '../../utils/mascaraTelefone';
 
 const Customers = () => {
+  const navigate = useNavigate();
   const [clientes, setClientes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -118,6 +120,7 @@ const Customers = () => {
     { key: 'actions', label: 'Ações', className: 'w-1 whitespace-nowrap', render: cliente => (
       <div className="flex items-center gap-1.5">
         <Button type="button" disabled={!cliente.telefone} onClick={() => openWhatsApp(cliente.telefone)} variant="success-soft" size="sm" aria-label={`Abrir WhatsApp de ${cliente.nome}`} title="WhatsApp"><FiMessageCircle size={15} />WhatsApp</Button>
+        <Button type="button" onClick={() => navigate(`/clientes/${cliente._id}`)} variant="outline" size="icon-sm" aria-label={`Detalhes de ${cliente.nome}`} title="Detalhes do cliente"><FiEye size={16} aria-hidden="true" /></Button>
         <Button type="button" onClick={() => handleEdit(cliente)} variant="outline" size="icon-sm" aria-label={`Editar ${cliente.nome}`} title="Editar cliente"><FiEdit2 size={15} /></Button>
         <Button type="button" onClick={() => handleDelete(cliente._id)} variant="danger-ghost" size="icon-sm" aria-label={`Excluir ${cliente.nome}`} title="Excluir cliente"><FiTrash2 size={15} /></Button>
       </div>

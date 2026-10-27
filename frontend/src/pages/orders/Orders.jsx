@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/DataTable';
 import { TbFileInvoice } from 'react-icons/tb';
+import { FiEye } from 'react-icons/fi';
 import api from '../../services/api';
 import Modal from '../../components/Modal';
 import StatusBadge from '../../components/StatusBadge';
@@ -128,7 +129,7 @@ const Orders = () => {
           { key: 'status', label: 'Status', render: p => <StatusBadge status={p.status} /> },
           { key: 'pagamento', label: 'Pagamento', render: p => <Select disabled={saving} aria-label={`Pagamento de ${p.nome_peca}`} size="sm" className="w-auto max-w-full" value={p.status_pagamento || 'PENDENTE'} onChange={e => updateField(p._id, 'status_pagamento', e.target.value)}>{paymentOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
           { key: 'status_edicao', label: 'Ações', render: p => <Select disabled={saving} aria-label={`Status de ${p.nome_peca}`} size="sm" className="w-auto max-w-full" value={p.status} onChange={e => updateField(p._id, 'status', e.target.value)}>{statusOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
-          { key: 'detalhes', label: 'Detalhes', render: p => <Button variant="outline" size="sm" onClick={() => navigate(`/pedidos/${p._id}`)} aria-label={`Detalhes de ${p.nome_peca}`}>Detalhes</Button> },
+          { key: 'detalhes', label: 'Detalhes', render: p => <Button variant="outline" size="icon-sm" onClick={() => navigate(`/pedidos/${p._id}`)} aria-label={`Detalhes de ${p.nome_peca}`} title={`Detalhes de ${p.nome_peca}`}><FiEye size={16} aria-hidden="true" /></Button> },
         ]}
         rows={pedidosFiltrados}
         getRowKey={p => p._id}
