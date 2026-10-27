@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
 import Dashboard from '../pages/dashboard/Dashboard';
 import Orders from '../pages/orders/Orders';
+import OrderDetails from '../pages/orders/OrderDetails';
 import Filaments from '../pages/filaments/Filaments';
 import FilamentDetails from '../pages/filaments/FilamentDetails';
 import Customers from '../pages/customers/Customers';
@@ -17,6 +18,7 @@ function AppRoutes() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="pedidos" element={<Orders />} />
+          <Route path="pedidos/:id" element={<OrderDetails />} />
           <Route path="calculadora" element={<Calculator />} />
           <Route path="filamentos" element={<Filaments />} />
           <Route path="filamentos/:id" element={<FilamentDetails />} />

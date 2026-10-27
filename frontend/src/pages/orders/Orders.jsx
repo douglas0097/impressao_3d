@@ -1,15 +1,20 @@
-import Input from '../../components/Input';
+import { useNavigate } from 'react-router-dom';
+import OrderForm from './OrderForm';
+import { statusOptions, paymentOptions } from './orderValues';
 import Select from '../../components/Select';
 import Button from '../../components/Button';
 import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/DataTable';
-import { TbCalculator, TbFileInvoice } from 'react-icons/tb';
+import { TbFileInvoice } from 'react-icons/tb';
 import api from '../../services/api';
 import Modal from '../../components/Modal';
 import StatusBadge from '../../components/StatusBadge';
 import PageHeader from '../../components/PageHeader';
 
 const Orders = () => {
+  const navigate = useNavigate();
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -17,22 +22,8 @@ const Orders = () => {
   const [filamentos, setFilamentos] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loadingCalc, setLoadingCalc] = useState(false);
   const [filtroCampo, setFiltroCampo] = useState('cliente');
   const [filtroValor, setFiltroValor] = useState('');
-
-  const [formData, setFormData] = useState({
-    cliente_id: '',
-    nome_peca: '',
-    link_modelo: '',
-    filamento_id: '',
-    quantidade_pecas: 1,
-    peso_estimado_g: '',
-    horas: '',
-    minutos: '',
-  });
-
-  const [calculoRealTime, setCalculoRealTime] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -55,69 +46,27 @@ const Orders = () => {
     }
   };
 
-  const handleSimulate = async () => {
-    if (!formData.filamento_id || !formData.peso_estimado_g || formData.horas === '' || formData.minutos === '') return;
-    setLoadingCalc(true);
+  const handleSubmit = async payload => {
+    setSaving(true);
+    setSaveError('');
     try {
-      const res = await api.post('/pedidos/calcular', {
-        filamento_id: formData.filamento_id,
-        peso_estimado_g: Number(formData.peso_estimado_g),
-        horas: Number(formData.horas),
-        minutos: Number(formData.minutos)
-      });
-      setCalculoRealTime(res.data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoadingCalc(false);
-    }
+      await api.post('/pedidos', payload);
+      setIsModalOpen(false);
+      await fetchData();
+    } catch (err) {
+      setSaveError(err.response?.data?.message || 'Falha ao salvar o pedido.');
+    } finally { setSaving(false); }
   };
 
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      handleSimulate();
-    }, 500);
-    return () => clearTimeout(delayDebounceFn);
-  }, [formData.filamento_id, formData.peso_estimado_g, formData.horas, formData.minutos]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const filamentoSelecionado = filamentos.find(f => f._id === formData.filamento_id);
-    if (filamentoSelecionado) {
-      const estoque = filamentoSelecionado.estoque_gramas != null ? filamentoSelecionado.estoque_gramas : filamentoSelecionado.peso_total_g;
-      if (Number(formData.peso_estimado_g) > estoque) {
-        alert(`Estoque insuficiente! Você só tem ${estoque}g disponíveis deste filamento.`);
-        return;
-      }
-    }
-
-    const payload = {
-      cliente_id: formData.cliente_id,
-      nome_peca: formData.nome_peca,
-      link_modelo: formData.link_modelo,
-      filamento_id: formData.filamento_id,
-      quantidade_pecas: Number(formData.quantidade_pecas) || 1,
-      peso_estimado_g: Number(formData.peso_estimado_g),
-      horas: Number(formData.horas),
-      minutos: Number(formData.minutos),
-      preco_final_cobrado: calculoRealTime?.preco_sugerido
-    };
-    await api.post('/pedidos', payload);
-    setIsModalOpen(false);
-    setFormData({ cliente_id: '', nome_peca: '', link_modelo: '', filamento_id: '', quantidade_pecas: 1, peso_estimado_g: '', horas: '', minutos: '' });
-    setCalculoRealTime(null);
-    fetchData();
-  };
-
-  const updateStatus = async (id, newStatus) => {
-    await api.put(`/pedidos/${id}`, { status: newStatus });
-    fetchData();
-  };
-
-  const updatePaymentStatus = async (id, newStatus) => {
-    await api.put(`/pedidos/${id}`, { status_pagamento: newStatus });
-    fetchData();
+  const updateField = async (id, field, value) => {
+    setSaving(true);
+    setSaveError('');
+    try {
+      await api.put(`/pedidos/${id}`, { [field]: value });
+      await fetchData();
+    } catch (err) {
+      setSaveError(err.response?.data?.message || 'Falha ao atualizar o pedido.');
+    } finally { setSaving(false); }
   };
 
   const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
@@ -145,19 +94,6 @@ const Orders = () => {
     return true;
   });
 
-  const statusOptions = [
-    { value: 'ORCAMENTO', label: 'Orçamento' },
-    { value: 'APROVADO', label: 'Aprovado' },
-    { value: 'EM_IMPRESSAO', label: 'Em Impressão' },
-    { value: 'CONCLUIDO', label: 'Concluído' },
-    { value: 'ENTREGUE', label: 'Entregue' },
-    { value: 'CANCELADO', label: 'Cancelado' },
-  ];
-  const paymentOptions = [
-    { value: 'PENDENTE', label: 'Pendente' },
-    { value: 'SINAL_50', label: 'Sinal 50%' },
-    { value: 'PAGO', label: 'Pago' },
-  ];
   const filters = [{ label: 'Campo de pesquisa', value: filtroCampo, onChange: value => { setFiltroCampo(value); setFiltroValor(''); }, options: [
     { value: 'cliente', label: 'Cliente' }, { value: 'peca', label: 'Peça' },
     { value: 'data', label: 'Data do Pedido' }, { value: 'status', label: 'Status' }, { value: 'pagamento', label: 'Pagamento' },
@@ -176,8 +112,9 @@ const Orders = () => {
         subtitle="Crie orçamentos e acompanhe seus pedidos e pagamentos."
         buttonLabel="Novo Orçamento"
         buttonIcon={<TbFileInvoice size={20} />}
-        onButtonClick={() => setIsModalOpen(true)}
+        onButtonClick={() => { setSaveError(''); setIsModalOpen(true); }}
       />
+      {saveError && !isModalOpen && <p role="alert" className="mb-4 text-danger">{saveError}</p>}
       <DataTable
         title="Lista de pedidos"
         description="Acompanhe seus orçamentos, a produção e os pagamentos."
@@ -187,10 +124,11 @@ const Orders = () => {
           { key: 'cliente', label: 'Cliente', render: p => p.cliente_id?.nome || '-' },
           { key: 'filamento', label: 'Filamento', render: p => p.filamento_id?.nome || '-' },
           { key: 'tempo_peso', label: 'Tempo/Peso', className: 'whitespace-nowrap', render: p => `${p.tempo_estimado_horas}h / ${p.peso_estimado_g}g` },
-          { key: 'preco', label: 'Preço Venda', className: 'font-semibold text-success whitespace-nowrap', render: p => formatCurrency(p.preco_final_cobrado || p.preco_sugerido) },
+          { key: 'preco', label: 'Preço Venda', className: 'font-semibold text-success whitespace-nowrap', render: p => formatCurrency(p.preco_final_cobrado ?? p.preco_sugerido) },
           { key: 'status', label: 'Status', render: p => <StatusBadge status={p.status} /> },
-          { key: 'pagamento', label: 'Pagamento', render: p => <Select aria-label={`Pagamento de ${p.nome_peca}`} size="sm" className="w-auto max-w-full" value={p.status_pagamento || 'PENDENTE'} onChange={e => updatePaymentStatus(p._id, e.target.value)}>{paymentOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
-          { key: 'actions', label: 'Ações', render: p => <Select aria-label={`Status de ${p.nome_peca}`} size="sm" className="w-auto max-w-full" value={p.status} onChange={e => updateStatus(p._id, e.target.value)}>{statusOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
+          { key: 'pagamento', label: 'Pagamento', render: p => <Select disabled={saving} aria-label={`Pagamento de ${p.nome_peca}`} size="sm" className="w-auto max-w-full" value={p.status_pagamento || 'PENDENTE'} onChange={e => updateField(p._id, 'status_pagamento', e.target.value)}>{paymentOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
+          { key: 'status_edicao', label: 'Ações', render: p => <Select disabled={saving} aria-label={`Status de ${p.nome_peca}`} size="sm" className="w-auto max-w-full" value={p.status} onChange={e => updateField(p._id, 'status', e.target.value)}>{statusOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
+          { key: 'detalhes', label: 'Detalhes', render: p => <Button variant="outline" size="sm" onClick={() => navigate(`/pedidos/${p._id}`)} aria-label={`Detalhes de ${p.nome_peca}`}>Detalhes</Button> },
         ]}
         rows={pedidosFiltrados}
         getRowKey={p => p._id}
@@ -210,95 +148,9 @@ const Orders = () => {
         emptyDescription={pedidos.length === 0 ? 'Crie seu primeiro pedido no botão Novo Orçamento.' : 'Tente outro termo ou altere o filtro de pesquisa.'}
       />
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Motor de Orçamentos">
-        <form onSubmit={handleSubmit}>
-          <div className="responsive-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
-            <div className="form-group">
-              <label htmlFor="orders-field-1" className="form-label">Cliente *</label>
-              <Select id="orders-field-1" required value={formData.cliente_id} onChange={e => setFormData({ ...formData, cliente_id: e.target.value })}>
-                <option value="">Selecione um cliente...</option>
-                {clientes.map(c => <option key={c._id} value={c._id}>{c.nome}</option>)}
-              </Select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="orders-field-2" className="form-label">Filamento *</label>
-              <Select id="orders-field-2" required value={formData.filamento_id} onChange={e => setFormData({ ...formData, filamento_id: e.target.value })}>
-                <option value="">Selecione um filamento...</option>
-                {filamentos.map(f => {
-                  const estoque = f.estoque_gramas != null ? f.estoque_gramas : f.peso_total_g;
-                  const precoKg = f.preco_kg != null ? f.preco_kg : (f.preco_pago ?? 0);
-                  return (
-                    <option key={f._id} value={f._id}>
-                      {f.nome} - Estoque: {estoque}g (R$ {precoKg.toFixed(2)}/kg)
-                    </option>
-                  );
-                })}
-              </Select>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="orders-field-3" className="form-label">Nome da Peça *</label>
-            <Input id="orders-field-3" required value={formData.nome_peca} onChange={e => setFormData({ ...formData, nome_peca: e.target.value })} placeholder="Ex: TCG GB case 105%" />
-          </div>
-
-          <div className="responsive-grid" style={{ gridTemplateColumns: '1.2fr 1fr 1fr' }}>
-            <div className="form-group">
-              <label htmlFor="orders-field-4" className="form-label">Peso do Fatiador (g) *</label>
-              <Input id="orders-field-4" type="number" step="0.1" required value={formData.peso_estimado_g} onChange={e => setFormData({ ...formData, peso_estimado_g: e.target.value })} placeholder="Ex: 85" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="orders-field-5" className="form-label">Tempo - Horas *</label>
-              <Input id="orders-field-5" type="number" min="0" required value={formData.horas} onChange={e => setFormData({ ...formData, horas: e.target.value })} placeholder="Ex: 3" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="orders-field-6" className="form-label">Tempo - Minutos *</label>
-              <Input id="orders-field-6" type="number" min="0" max="59" required value={formData.minutos} onChange={e => setFormData({ ...formData, minutos: e.target.value })} placeholder="Ex: 45" />
-            </div>
-          </div>
-
-          {/* Painel de Cálculo em Tempo Real */}
-          <div style={{ background: 'var(--brand-soft)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-focus)', marginBottom: '1.5rem' }}>
-            <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--primary)' }}>
-              <TbCalculator size={18} /> Simulação Financeira
-              {loadingCalc && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}> (Calculando...)</span>}
-            </h4>
-
-            {calculoRealTime ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem' }}>
-                <div className="flex-between">
-                  <span style={{ color: 'var(--text-muted)' }}>Custo Filamento (c/ retrabalho):</span>
-                  <span>{formatCurrency(calculoRealTime.custo_filamento)}</span>
-                </div>
-                <div className="flex-between">
-                  <span style={{ color: 'var(--text-muted)' }}>Custo Tempo (energia + manutenção):</span>
-                  <span>{formatCurrency(calculoRealTime.custo_tempo_impressao)}</span>
-                </div>
-                <div className="flex-between">
-                  <span style={{ color: 'var(--text-muted)' }}>Preço de Custo Real:</span>
-                  <span style={{ fontWeight: '500' }}>{formatCurrency(calculoRealTime.preco_custo)}</span>
-                </div>
-                <hr style={{ borderColor: 'var(--border-light)', margin: '0.5rem 0' }} />
-                <div className="flex-between">
-                  <span style={{ fontWeight: '500' }}>Custo Total sem Lucro:</span>
-                  <span className="text-warning">{formatCurrency(calculoRealTime.custo_total_sem_lucro)}</span>
-                </div>
-                <div className="flex-between" style={{ marginTop: '0.5rem', fontSize: '1.1rem' }}>
-                  <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>Preço de Venda Sugerido:</span>
-                  <span className="text-success" style={{ fontWeight: '700' }}>{formatCurrency(calculoRealTime.preco_sugerido)}</span>
-                </div>
-              </div>
-            ) : (
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
-                Preencha filamento, peso, horas e minutos para visualizar a simulação de custos automaticamente.
-              </p>
-            )}
-          </div>
-
-          <Button type="submit" fullWidth disabled={!calculoRealTime}>
-            Salvar como Pedido / Orçamento
-          </Button>
-        </form>
+      <Modal isOpen={isModalOpen} onClose={() => { if (!saving) setIsModalOpen(false); }} title="Novo orçamento / pedido">
+        {saveError && <p role="alert" className="mb-4 text-danger">{saveError}</p>}
+        {isModalOpen && <OrderForm clientes={clientes} filamentos={filamentos} saving={saving} onSubmit={handleSubmit} />}
       </Modal>
     </div>
   );
