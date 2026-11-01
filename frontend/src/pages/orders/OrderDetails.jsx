@@ -93,40 +93,151 @@ function OrderDetailsContent({ id }) {
       onDelete={() => { setFormError(''); setDeleting(true); }}
     >
       {editing ? <DetailSection title="Editar informações">
-        <div className="w-full"><OrderForm initial={order} clientes={clientes} filamentos={filamentos} saving={busy} onSubmit={save} /></div>
+        <div className="w-full">
+          <OrderForm
+            initial={order}
+            clientes={clientes}
+            filamentos={filamentos}
+            saving={busy}
+            onSubmit={save}
+            onCancel={() => setEditing(false)}
+          />
+        </div>
       </DetailSection> : <>
-        <DetailSection title="Informações da peça e do cliente">
+        <DetailSection title="Informações gerais e do cliente">
           <DetailGrid>
-            <DetailValue label="Peça" value={order.nome_peca} />
             <DetailValue label="Cliente" value={order.cliente_id?.nome || 'Cliente indisponível'} />
             <DetailValue label="Telefone" value={order.cliente_id?.telefone || 'Não informado'} />
-            <DetailValue label="Filamento" value={order.filamento_id?.nome || 'Filamento indisponível'} />
-            <DetailValue label="Modelo" value={safeLink ? <a className="text-primary underline" href={safeLink} target="_blank" rel="noopener noreferrer">Abrir modelo</a> : order.link_modelo || 'Não informado'} />
-          </DetailGrid>
-        </DetailSection>
-        <DetailSection title="Produção">
-          <DetailGrid>
-            <DetailValue label="Quantidade" value={order.quantidade_pecas ?? 1} />
-            <DetailValue label="Peso total" value={`${order.peso_estimado_g} g`} />
-            <DetailValue label="Tempo total de impressão" value={`${time.horas} h ${time.minutos} min`} />
-            <DetailValue label="Status" value={<StatusBadge status={order.status} />} />
-          </DetailGrid>
-        </DetailSection>
-        <DetailSection title="Custos e valores">
-          <DetailGrid>
-            <DetailValue label="Custo de filamento" value={formatMoney(order.custo_filamento)} />
-            <DetailValue label="Custo de impressão" value={formatMoney(order.custo_tempo_impressao ?? order.custo_tempo_energia)} />
-            <DetailValue label="Preço de custo" value={formatMoney(order.preco_custo)} />
-            <DetailValue label="Custo total sem lucro" value={formatMoney(order.custo_total_sem_lucro)} />
-            <DetailValue label="Preço sugerido" value={formatMoney(order.preco_sugerido)} />
-            <DetailValue label="Preço final cobrado" value={formatMoney(order.preco_final_cobrado ?? order.preco_sugerido)} />
-          </DetailGrid>
-        </DetailSection>
-        <DetailSection title="Pagamento">
-          <DetailGrid>
-            <DetailValue label="Pagamento" value={<StatusBadge type="pagamento" status={order.status_pagamento} />} />
+            <DetailValue label="Status do pedido" value={<StatusBadge status={order.status} />} />
+            <DetailValue label="Status do pagamento" value={<StatusBadge type="pagamento" status={order.status_pagamento} />} />
             <DetailValue label="Valor do sinal" value={formatMoney(order.valor_sinal)} />
           </DetailGrid>
+        </DetailSection>
+
+        {/* Seção de Peças 3D */}
+        {Array.isArray(order.pecas) && order.pecas.length > 0 ? (
+          <DetailSection title={`Peças do pedido (${order.pecas.length})`}>
+            <div className="space-y-3">
+              {order.pecas.map((peca, idx) => {
+                const pTime = splitTime(peca.tempo_total_horas ?? peca.tempo_estimado_horas);
+                const pLink = /^https?:\/\//i.test(peca.link_modelo || '') ? peca.link_modelo : null;
+                return (
+                  <div key={peca._id || idx} className="rounded-lg border border-border bg-background/50 p-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                      <div>
+                        <span className="font-semibold text-text-primary text-base">{peca.nome_peca}</span>
+                        <span className="ml-2 rounded bg-surface px-2 py-0.5 text-xs text-text-secondary">
+                          {peca.quantidade} {peca.quantidade === 1 ? 'unidade' : 'unidades'}
+                        </span>
+                      </div>
+                      <div className="text-sm font-semibold text-emerald-400">
+                        Sugerido: {formatMoney(peca.preco_sugerido)}
+                      </div>
+                    </div>
+                    <DetailGrid>
+                      <DetailValue label="Filamento" value={peca.filamento_id?.nome || 'Filamento não informado'} />
+                      <DetailValue label="Peso total" value={`${peca.peso_total_g ?? peca.peso_estimado_g} g`} />
+                      <DetailValue label="Tempo de impressão" value={`${pTime.horas}h ${pTime.minutos}min`} />
+                      <DetailValue label="Custo filamento" value={formatMoney(peca.custo_filamento)} />
+                      <DetailValue label="Custo impressão" value={formatMoney(peca.custo_tempo_impressao)} />
+                      <DetailValue label="Preço de custo" value={formatMoney(peca.preco_custo)} />
+                      <DetailValue label="Custo sem lucro" value={formatMoney(peca.custo_total_sem_lucro)} />
+                      <DetailValue label="Preço sugerido" value={formatMoney(peca.preco_sugerido)} />
+                      <DetailValue label="Modelo 3D" value={pLink ? <a className="text-primary underline" href={pLink} target="_blank" rel="noopener noreferrer">Abrir modelo</a> : (peca.link_modelo || 'Não informado')} />
+                    </DetailGrid>
+                  </div>
+                );
+              })}
+            </div>
+          </DetailSection>
+        ) : (
+          /* Fallback para pedidos legados */
+          <DetailSection title="Produção (Peça única legada)">
+            <DetailGrid>
+              <DetailValue label="Peça" value={order.nome_peca} />
+              <DetailValue label="Filamento" value={order.filamento_id?.nome || 'Filamento indisponível'} />
+              <DetailValue label="Quantidade" value={order.quantidade_pecas ?? 1} />
+              <DetailValue label="Peso total" value={`${order.peso_estimado_g} g`} />
+              <DetailValue label="Tempo de impressão" value={`${time.horas} h ${time.minutos} min`} />
+              <DetailValue label="Custo filamento" value={formatMoney(order.custo_filamento)} />
+              <DetailValue label="Custo impressão" value={formatMoney(order.custo_tempo_impressao ?? order.custo_tempo_energia)} />
+              <DetailValue label="Preço de custo" value={formatMoney(order.preco_custo)} />
+              <DetailValue label="Custo sem lucro" value={formatMoney(order.custo_total_sem_lucro)} />
+              <DetailValue label="Preço sugerido" value={formatMoney(order.preco_sugerido)} />
+              <DetailValue label="Modelo 3D" value={safeLink ? <a className="text-primary underline" href={safeLink} target="_blank" rel="noopener noreferrer">Abrir modelo</a> : (order.link_modelo || 'Não informado')} />
+            </DetailGrid>
+          </DetailSection>
+        )}
+
+        {/* Seção de Extras (se houver) */}
+        {Array.isArray(order.extras) && order.extras.length > 0 && (
+          <DetailSection title={`Produtos extras (${order.extras.length})`}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {order.extras.map((extra, idx) => (
+                <div key={extra._id || idx} className="rounded-lg border border-border bg-background/50 p-3.5 flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold text-text-primary text-sm block">{extra.nome}</span>
+                    <span className="text-xs text-text-secondary">
+                      {extra.quantidade}x a {formatMoney(extra.preco_unitario)} cada
+                    </span>
+                  </div>
+                  <span className="font-bold text-sm text-text-primary">
+                    {formatMoney(extra.custo_total)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </DetailSection>
+        )}
+
+        {/* Seção de Consolidação Financeira */}
+        <DetailSection title="Custos e valores consolidados">
+          <DetailGrid>
+            <DetailValue label="Custo total de filamento" value={formatMoney(order.custo_filamento)} />
+            <DetailValue label="Custo total de impressão" value={formatMoney(order.custo_tempo_impressao ?? order.custo_tempo_energia)} />
+            <DetailValue label="Preço de custo das peças" value={formatMoney(order.preco_custo_pecas ?? order.preco_custo)} />
+            <DetailValue label="Custo sem lucro das peças" value={formatMoney(order.custo_total_sem_lucro_pecas ?? order.custo_total_sem_lucro)} />
+            <DetailValue label="Preço sugerido das peças" value={formatMoney(order.preco_sugerido_pecas ?? order.preco_sugerido)} />
+            {Number(order.custo_total_extras || 0) > 0 && (
+              <DetailValue label="Custo total dos extras" value={formatMoney(order.custo_total_extras)} />
+            )}
+            <DetailValue
+              label="Preço sugerido final"
+              value={<span className="font-bold text-emerald-400">{formatMoney(order.preco_sugerido)}</span>}
+            />
+            <DetailValue
+              label="Preço final cobrado"
+              value={<span className="font-bold text-success">{formatMoney(order.preco_final_cobrado ?? order.preco_sugerido)}</span>}
+            />
+          </DetailGrid>
+        </DetailSection>
+
+        {/* Seção de Configurações Históricas */}
+        <DetailSection title="Configurações utilizadas neste pedido">
+          {order.configuracao_snapshot && (order.configuracao_snapshot.custo_energia != null || order.configuracao_snapshot.taxa_manutencao != null) ? (
+            <DetailGrid>
+              <DetailValue
+                label="Custo de energia elétrica"
+                value={`${formatMoney(order.configuracao_snapshot.custo_energia)} / hora`}
+              />
+              <DetailValue
+                label="Custo de manutenção"
+                value={`${formatMoney(order.configuracao_snapshot.taxa_manutencao)} / hora`}
+              />
+              <DetailValue
+                label="Percentual de retrabalho"
+                value={`${order.configuracao_snapshot.taxa_retrabalho_pct}%`}
+              />
+              <DetailValue
+                label="Margem de lucro"
+                value={`${order.configuracao_snapshot.margem_lucro_padrao_pct}%`}
+              />
+            </DetailGrid>
+          ) : (
+            <p className="text-xs text-text-secondary italic">
+              Histórico de configurações não disponível para este pedido.
+            </p>
+          )}
         </DetailSection>
         <DetailsFooter createdAt={order.createdAt} updatedAt={order.updatedAt} />
       </>}

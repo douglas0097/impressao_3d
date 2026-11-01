@@ -79,7 +79,11 @@ const Orders = () => {
       return p.cliente_id?.nome?.toLowerCase().includes(filtroValor.toLowerCase());
     }
     if (filtroCampo === 'peca') {
-      return p.nome_peca?.toLowerCase().includes(filtroValor.toLowerCase());
+      const q = filtroValor.toLowerCase();
+      const inLegacy = p.nome_peca?.toLowerCase().includes(q);
+      const inPecas = Array.isArray(p.pecas) && p.pecas.some(item => item.nome_peca?.toLowerCase().includes(q));
+      const inExtras = Array.isArray(p.extras) && p.extras.some(item => item.nome?.toLowerCase().includes(q));
+      return inLegacy || inPecas || inExtras;
     }
     if (filtroCampo === 'data') {
       if (!p.createdAt) return false;
@@ -106,6 +110,57 @@ const Orders = () => {
     ] });
   }
 
+  const renderPecaLabel = (p) => {
+    if (Array.isArray(p.pecas) && p.pecas.length > 0) {
+      const first = p.pecas[0].nome_peca;
+      const extraParts = p.pecas.length - 1;
+      const extrasCount = Array.isArray(p.extras) ? p.extras.length : 0;
+      return (
+        <div>
+          <span className="font-semibold text-text-primary">{first}</span>
+          {extraParts > 0 && (
+            <span className="ml-1 text-xs text-text-secondary">
+              (+{extraParts} {extraParts === 1 ? 'peça' : 'peças'})
+            </span>
+          )}
+          {extrasCount > 0 && (
+            <span className="ml-1.5 inline-block rounded bg-violet-500/10 px-1.5 py-0.2 text-[10px] font-medium text-violet-400">
+              +{extrasCount} {extrasCount === 1 ? 'extra' : 'extras'}
+            </span>
+          )}
+        </div>
+      );
+    }
+    if (Array.isArray(p.extras) && p.extras.length > 0) {
+      const first = p.extras[0].nome;
+      const extraItems = p.extras.length - 1;
+      return (
+        <div>
+          <span className="font-semibold text-text-primary">{first}</span>
+          {extraItems > 0 && (
+            <span className="ml-1 text-xs text-text-secondary">
+              (+{extraItems} extras)
+            </span>
+          )}
+        </div>
+      );
+    }
+    return <span className="font-semibold text-text-primary">{p.nome_peca || '-'}</span>;
+  };
+
+  const renderFilamentoLabel = (p) => {
+    if (Array.isArray(p.pecas) && p.pecas.length > 0) {
+      const names = Array.from(new Set(
+        p.pecas.map(item => item.filamento_id?.nome || (typeof item.filamento_id === 'string' ? filamentos.find(f => f._id === item.filamento_id)?.nome : null)).filter(Boolean)
+      ));
+      if (names.length > 1) {
+        return <span className="cursor-help text-xs font-medium text-brand" title={names.join(', ')}>Vários ({names.length})</span>;
+      }
+      if (names.length === 1) return names[0];
+    }
+    return p.filamento_id?.nome || '-';
+  };
+
   return (
     <div>
       <PageHeader
@@ -121,15 +176,15 @@ const Orders = () => {
         description="Acompanhe seus orçamentos, a produção e os pagamentos."
         columns={[
           { key: 'createdAt', label: 'Data', className: 'whitespace-nowrap text-text-secondary', render: p => p.createdAt ? new Date(p.createdAt).toLocaleDateString('pt-BR') : '-' },
-          { key: 'nome_peca', label: 'Peça', className: 'font-semibold' },
+          { key: 'nome_peca', label: 'Peça / Itens', render: renderPecaLabel },
           { key: 'cliente', label: 'Cliente', render: p => p.cliente_id?.nome || '-' },
-          { key: 'filamento', label: 'Filamento', render: p => p.filamento_id?.nome || '-' },
-          { key: 'tempo_peso', label: 'Tempo/Peso', className: 'whitespace-nowrap', render: p => `${p.tempo_estimado_horas}h / ${p.peso_estimado_g}g` },
+          { key: 'filamento', label: 'Filamento', render: renderFilamentoLabel },
+          { key: 'tempo_peso', label: 'Tempo/Peso', className: 'whitespace-nowrap', render: p => (p.tempo_estimado_horas > 0 || p.peso_estimado_g > 0) ? `${p.tempo_estimado_horas}h / ${p.peso_estimado_g}g` : '-' },
           { key: 'preco', label: 'Preço Venda', className: 'font-semibold text-success whitespace-nowrap', render: p => formatCurrency(p.preco_final_cobrado ?? p.preco_sugerido) },
           { key: 'status', label: 'Status', render: p => <StatusBadge status={p.status} /> },
-          { key: 'pagamento', label: 'Pagamento', render: p => <Select disabled={saving} aria-label={`Pagamento de ${p.nome_peca}`} size="sm" className="w-auto max-w-full" value={p.status_pagamento || 'PENDENTE'} onChange={e => updateField(p._id, 'status_pagamento', e.target.value)}>{paymentOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
-          { key: 'status_edicao', label: 'Ações', render: p => <Select disabled={saving} aria-label={`Status de ${p.nome_peca}`} size="sm" className="w-auto max-w-full" value={p.status} onChange={e => updateField(p._id, 'status', e.target.value)}>{statusOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
-          { key: 'detalhes', label: 'Detalhes', render: p => <Button variant="outline" size="icon-sm" onClick={() => navigate(`/pedidos/${p._id}`)} aria-label={`Detalhes de ${p.nome_peca}`} title={`Detalhes de ${p.nome_peca}`}><FiEye size={16} aria-hidden="true" /></Button> },
+          { key: 'pagamento', label: 'Pagamento', render: p => <Select disabled={saving} aria-label={`Pagamento de ${p.nome_peca || 'pedido'}`} size="sm" className="w-auto max-w-full" value={p.status_pagamento || 'PENDENTE'} onChange={e => updateField(p._id, 'status_pagamento', e.target.value)}>{paymentOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
+          { key: 'status_edicao', label: 'Ações', render: p => <Select disabled={saving} aria-label={`Status de ${p.nome_peca || 'pedido'}`} size="sm" className="w-auto max-w-full" value={p.status} onChange={e => updateField(p._id, 'status', e.target.value)}>{statusOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
+          { key: 'detalhes', label: 'Detalhes', render: p => <Button variant="outline" size="icon-sm" onClick={() => navigate(`/pedidos/${p._id}`)} aria-label={`Detalhes de ${p.nome_peca || 'pedido'}`} title={`Detalhes de ${p.nome_peca || 'pedido'}`}><FiEye size={16} aria-hidden="true" /></Button> },
         ]}
         rows={pedidosFiltrados}
         getRowKey={p => p._id}
@@ -149,9 +204,22 @@ const Orders = () => {
         emptyDescription={pedidos.length === 0 ? 'Crie seu primeiro pedido no botão Novo Orçamento.' : 'Tente outro termo ou altere o filtro de pesquisa.'}
       />
 
-      <Modal isOpen={isModalOpen} onClose={() => { if (!saving) setIsModalOpen(false); }} title="Novo orçamento / pedido">
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => { if (!saving) setIsModalOpen(false); }}
+        title="Novo Pedido / Orçamento"
+        maxWidth="820px"
+      >
         {saveError && <p role="alert" className="mb-4 text-danger">{saveError}</p>}
-        {isModalOpen && <OrderForm clientes={clientes} filamentos={filamentos} saving={saving} onSubmit={handleSubmit} />}
+        {isModalOpen && (
+          <OrderForm
+            clientes={clientes}
+            filamentos={filamentos}
+            saving={saving}
+            onSubmit={handleSubmit}
+            onCancel={() => setIsModalOpen(false)}
+          />
+        )}
       </Modal>
     </div>
   );

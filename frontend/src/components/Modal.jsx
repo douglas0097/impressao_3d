@@ -2,13 +2,20 @@ import Button from './Button';
 import React, { useId } from 'react';
 import { FiX } from 'react-icons/fi';
 
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({ isOpen, onClose, title, children, maxWidth, maxWidthClass, zIndexClass }) => {
   const titleId = useId();
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby={titleId} onClick={e => e.stopPropagation()}>
+    <div className={`modal-overlay ${zIndexClass || ''}`} onClick={onClose}>
+      <div
+        className={`modal-content ${maxWidthClass || ''}`}
+        style={maxWidth ? { maxWidth } : undefined}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        onClick={e => e.stopPropagation()}
+      >
         <div className="modal-header">
           <h2 id={titleId} className="modal-title">{title}</h2>
           <Button variant="ghost" size="icon-sm" className="modal-close" aria-label="Fechar modal"
