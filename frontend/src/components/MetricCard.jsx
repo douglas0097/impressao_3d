@@ -1,13 +1,15 @@
-﻿import { FiArrowDownRight, FiArrowUpRight } from 'react-icons/fi';
+import { FiArrowDownRight, FiArrowUpRight } from 'react-icons/fi';
 
 const tones = {
   blue: 'bg-blue-50 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400',
   emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400',
   amber: 'bg-amber-50 text-amber-600 dark:bg-amber-400/10 dark:text-amber-400',
   violet: 'bg-violet-50 text-violet-600 dark:bg-violet-400/10 dark:text-violet-400',
+  cyan: 'bg-cyan-50 text-cyan-600 dark:bg-cyan-400/10 dark:text-cyan-400',
+  rose: 'bg-rose-50 text-rose-600 dark:bg-rose-400/10 dark:text-rose-400',
 };
 
-const MetricCard = ({ title, value, icon, trend, tone = 'blue' }) => {
+const MetricCard = ({ title, value, icon, trend, subtext, tone = 'blue' }) => {
   const TrendIcon = trend?.isPositive ? FiArrowUpRight : FiArrowDownRight;
 
   return (
@@ -30,7 +32,12 @@ const MetricCard = ({ title, value, icon, trend, tone = 'blue' }) => {
             {trend.value}
           </span>
         )}
-        {!trend && <span className="inline-flex items-center gap-2 text-[10px] leading-4 text-text-secondary"><span aria-hidden="true" className="metric-card-dot size-1.5 rounded-full" />{title}</span>}
+        {!trend && (
+          <span className="inline-flex items-center gap-2 text-[10px] leading-4 text-text-secondary">
+            <span aria-hidden="true" className="metric-card-dot size-1.5 rounded-full" />
+            {subtext || title}
+          </span>
+        )}
       </div>
     </div>
   );

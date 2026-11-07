@@ -14,3 +14,7 @@ export function formatNumeroLocalizado(value, decimals = 2) {
     maximumFractionDigits: decimals,
   });
 }
+
+export function formatCurrency(value) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value) || 0);
+}
