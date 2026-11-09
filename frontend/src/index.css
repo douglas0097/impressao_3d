@@ -218,6 +218,15 @@
   .flex-between { @apply flex items-center justify-between; }
   .responsive-grid { @apply grid gap-4; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
   .modal-overlay { @apply fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm; background: rgb(8 15 26 / 45%); }
+  @media (min-width: 48rem) {
+    .modal-overlay {
+      left: var(--sidebar-width, 0px);
+      transition: left 300ms ease-out;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .modal-overlay { transition: none; }
+  }
   .modal-content {
     @apply flex w-full max-w-[500px] flex-col overflow-hidden rounded-2xl border bg-surface;
     max-height: min(90dvh, calc(100dvh - 2rem));

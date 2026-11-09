@@ -6,10 +6,10 @@ import Button from '../../components/Button';
 import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/DataTable';
 import { TbFileInvoice } from 'react-icons/tb';
-import { FiEye } from 'react-icons/fi';
+import { FiEye, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import api from '../../services/api';
 import Modal from '../../components/Modal';
-import StatusBadge from '../../components/StatusBadge';
+import { DeleteDetailsDialog } from '../../components/details/Details';
 import PageHeader from '../../components/PageHeader';
 
 const Orders = () => {
@@ -23,6 +23,8 @@ const Orders = () => {
   const [filamentos, setFilamentos] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingOrder, setEditingOrder] = useState(null);
+  const [deletingOrder, setDeletingOrder] = useState(null);
   const [filtroCampo, setFiltroCampo] = useState('cliente');
   const [filtroValor, setFiltroValor] = useState('');
 
@@ -51,8 +53,13 @@ const Orders = () => {
     setSaving(true);
     setSaveError('');
     try {
-      await api.post('/pedidos', payload);
+      if (editingOrder) {
+        await api.put(`/pedidos/${editingOrder._id}`, payload);
+      } else {
+        await api.post('/pedidos', payload);
+      }
       setIsModalOpen(false);
+      setEditingOrder(null);
       await fetchData();
     } catch (err) {
       setSaveError(err.response?.data?.message || 'Falha ao salvar o pedido.');
@@ -67,6 +74,18 @@ const Orders = () => {
       await fetchData();
     } catch (err) {
       setSaveError(err.response?.data?.message || 'Falha ao atualizar o pedido.');
+    } finally { setSaving(false); }
+  };
+
+  const handleDelete = async () => {
+    setSaving(true);
+    setSaveError('');
+    try {
+      await api.delete(`/pedidos/${deletingOrder._id}`);
+      setDeletingOrder(null);
+      await fetchData();
+    } catch (err) {
+      setSaveError(err.response?.data?.message || 'Falha ao excluir o pedido.');
     } finally { setSaving(false); }
   };
 
@@ -148,18 +167,6 @@ const Orders = () => {
     return <span className="font-semibold text-text-primary">{p.nome_peca || '-'}</span>;
   };
 
-  const renderFilamentoLabel = (p) => {
-    if (Array.isArray(p.pecas) && p.pecas.length > 0) {
-      const names = Array.from(new Set(
-        p.pecas.map(item => item.filamento_id?.nome || (typeof item.filamento_id === 'string' ? filamentos.find(f => f._id === item.filamento_id)?.nome : null)).filter(Boolean)
-      ));
-      if (names.length > 1) {
-        return <span className="cursor-help text-xs font-medium text-brand" title={names.join(', ')}>Vários ({names.length})</span>;
-      }
-      if (names.length === 1) return names[0];
-    }
-    return p.filamento_id?.nome || '-';
-  };
 
   return (
     <div>
@@ -168,9 +175,9 @@ const Orders = () => {
         subtitle="Crie orçamentos e acompanhe seus pedidos e pagamentos."
         buttonLabel="Novo Orçamento"
         buttonIcon={<TbFileInvoice size={20} />}
-        onButtonClick={() => { setSaveError(''); setIsModalOpen(true); }}
+        onButtonClick={() => { setSaveError(''); setEditingOrder(null); setIsModalOpen(true); }}
       />
-      {saveError && !isModalOpen && <p role="alert" className="mb-4 text-danger">{saveError}</p>}
+      {saveError && !isModalOpen && !deletingOrder && <p role="alert" className="mb-4 text-danger">{saveError}</p>}
       <DataTable
         title="Lista de pedidos"
         description="Acompanhe seus orçamentos, a produção e os pagamentos."
@@ -178,13 +185,16 @@ const Orders = () => {
           { key: 'createdAt', label: 'Data', className: 'whitespace-nowrap text-text-secondary', render: p => p.createdAt ? new Date(p.createdAt).toLocaleDateString('pt-BR') : '-' },
           { key: 'nome_peca', label: 'Peça / Itens', render: renderPecaLabel },
           { key: 'cliente', label: 'Cliente', render: p => p.cliente_id?.nome || '-' },
-          { key: 'filamento', label: 'Filamento', render: renderFilamentoLabel },
-          { key: 'tempo_peso', label: 'Tempo/Peso', className: 'whitespace-nowrap', render: p => (p.tempo_estimado_horas > 0 || p.peso_estimado_g > 0) ? `${p.tempo_estimado_horas}h / ${p.peso_estimado_g}g` : '-' },
           { key: 'preco', label: 'Preço Venda', className: 'font-semibold text-success whitespace-nowrap', render: p => formatCurrency(p.preco_final_cobrado ?? p.preco_sugerido) },
-          { key: 'status', label: 'Status', render: p => <StatusBadge status={p.status} /> },
+          { key: 'status', label: 'Status', render: p => <Select disabled={saving} aria-label={`Status de ${p.nome_peca || 'pedido'}`} size="sm" className="w-auto max-w-full" value={p.status} onChange={e => updateField(p._id, 'status', e.target.value)}>{statusOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
           { key: 'pagamento', label: 'Pagamento', render: p => <Select disabled={saving} aria-label={`Pagamento de ${p.nome_peca || 'pedido'}`} size="sm" className="w-auto max-w-full" value={p.status_pagamento || 'PENDENTE'} onChange={e => updateField(p._id, 'status_pagamento', e.target.value)}>{paymentOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
-          { key: 'status_edicao', label: 'Ações', render: p => <Select disabled={saving} aria-label={`Status de ${p.nome_peca || 'pedido'}`} size="sm" className="w-auto max-w-full" value={p.status} onChange={e => updateField(p._id, 'status', e.target.value)}>{statusOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> },
-          { key: 'detalhes', label: 'Detalhes', render: p => <Button variant="outline" size="icon-sm" onClick={() => navigate(`/pedidos/${p._id}`)} aria-label={`Detalhes de ${p.nome_peca || 'pedido'}`} title={`Detalhes de ${p.nome_peca || 'pedido'}`}><FiEye size={16} aria-hidden="true" /></Button> },
+          { key: 'acoes', label: 'Ações', className: 'w-1 whitespace-nowrap', render: p => (
+            <div className="flex items-center gap-1.5">
+              <Button type="button" variant="outline" size="icon-sm" disabled={saving} onClick={() => navigate(`/pedidos/${p._id}`)} aria-label={`Detalhes de ${p.nome_peca || 'pedido'}`} title="Ver detalhes"><FiEye size={16} aria-hidden="true" /></Button>
+              <Button type="button" variant="outline" size="icon-sm" disabled={saving} onClick={() => { setSaveError(''); setEditingOrder(p); setIsModalOpen(true); }} aria-label={`Editar ${p.nome_peca || 'pedido'}`} title="Editar orçamento / pedido"><FiEdit2 size={16} aria-hidden="true" /></Button>
+              <Button type="button" variant="danger-ghost" size="icon-sm" disabled={saving} onClick={() => { setSaveError(''); setDeletingOrder(p); }} aria-label={`Excluir ${p.nome_peca || 'pedido'}`} title="Excluir orçamento / pedido"><FiTrash2 size={16} aria-hidden="true" /></Button>
+            </div>
+          ) },
         ]}
         rows={pedidosFiltrados}
         getRowKey={p => p._id}
@@ -207,12 +217,13 @@ const Orders = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => { if (!saving) setIsModalOpen(false); }}
-        title="Novo Pedido / Orçamento"
+        title={editingOrder ? "Editar Orçamento / Pedido" : "Novo Pedido / Orçamento"}
         maxWidth="820px"
       >
         {saveError && <p role="alert" className="mb-4 text-danger">{saveError}</p>}
         {isModalOpen && (
           <OrderForm
+            initial={editingOrder || {}}
             clientes={clientes}
             filamentos={filamentos}
             saving={saving}
@@ -221,6 +232,16 @@ const Orders = () => {
           />
         )}
       </Modal>
+      <DeleteDetailsDialog
+        isOpen={Boolean(deletingOrder)}
+        title="Excluir orçamento / pedido"
+        busy={saving}
+        error={saveError}
+        onCancel={() => { setDeletingOrder(null); setSaveError(''); }}
+        onConfirm={handleDelete}
+      >
+        Deseja excluir <strong>{deletingOrder?.nome_peca || deletingOrder?.pecas?.[0]?.nome_peca || deletingOrder?.extras?.[0]?.nome || 'este orçamento / pedido'}</strong>?
+      </DeleteDetailsDialog>
     </div>
   );
 };

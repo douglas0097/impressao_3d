@@ -22,7 +22,7 @@ function MainLayout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background" style={{ '--sidebar-width': sidebarCollapsed ? '76px' : '252px' }}>
       <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
       <main className={`min-w-0 flex-1 bg-content-bg p-4 pb-24 transition-[margin] duration-300 ease-out motion-reduce:transition-none md:p-7 ${sidebarCollapsed ? 'md:ml-[76px]' : 'md:ml-[252px]'}`}>
         <Outlet />
